@@ -91,6 +91,7 @@ import org.entando.entando.aps.system.services.userprofile.UserProfileTypeServic
 import org.entando.entando.aps.system.services.userprofile.ValidateUserProfileIntegrationTest;
 import org.entando.entando.aps.system.services.widgettype.api.TestApiWidgetTypeInterface;
 import org.entando.entando.aps.tags.CspNonceTagTest;
+import org.entando.entando.ent.exception.EntRuntimeException;
 import org.entando.entando.ent.util.EntLoggingTest;
 import org.entando.entando.aps.util.FilterUtilsTest;
 import org.entando.entando.aps.util.crypto.CompatiblePasswordEncoderTest;
@@ -109,150 +110,160 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for APS");
 
-        //
-        suite.addTest(new JUnit4TestAdapter(FileTextReaderTest.class));
-        //
-        suite.addTest(new JUnit4TestAdapter(PageInfoTagTest.class));
-        //
-        suite.addTest(new JUnit4TestAdapter(RestNamedIdTest.class));
-        //
-        suite.addTest(new JUnit4TestAdapter(PageTokenManagerTest.class));
-        //
-        suite.addTestSuite(EntLoggingTest.class);
-        //
-        suite.addTest(new JUnit4TestAdapter(EntSafeXmlUtilsTest.class));
-        //
-        suite.addTest(new JUnit4TestAdapter(InitializerManagerTest.class));
-        suite.addTest(new JUnit4TestAdapter(DatabaseManagerTest.class));
-        //
-        suite.addTestSuite(TestEntityManager.class);
-        //
-        suite.addTestSuite(ApiCatalogManagerIntegrationTest.class);
-        suite.addTest(new JUnit4TestAdapter(ApiCatalogManagerTest.class));
-        //
-        suite.addTestSuite(TestAuthorizationManager.class);
-        suite.addTestSuite(TestAuthorityManager.class);
-        //
-        suite.addTestSuite(TestBaseConfigService.class);
-        suite.addTestSuite(TestConfigItemDAO.class);
-        //
-        suite.addTestSuite(CacheInfoManagerIntegrationTest.class);
-        suite.addTest(new JUnit4TestAdapter(CacheInfoManagerTest.class));
-        //
-        suite.addTestSuite(TestCategoryManager.class);
-        //
-        suite.addTestSuite(TestGroupManager.class);
-        suite.addTestSuite(TestGroupUtilizer.class);
-        //
-        suite.addTestSuite(I18nManagerIntegrationTest.class);
-        suite.addTest(new JUnit4TestAdapter(I18nManagerTest.class));
-        suite.addTest(new JUnit4TestAdapter(I18nManagerCacheWrapperTest.class));
-        //
-        suite.addTestSuite(TestKeyGeneratorDAO.class);
-        suite.addTestSuite(KeyGeneratorManagerIntegrationTest.class);
-        //
-        suite.addTestSuite(LangManagerIntegrationTest.class);
-        suite.addTest(new JUnit4TestAdapter(LangManagerTest.class));
-        //
-        suite.addTestSuite(TestPageManager.class);
-        suite.addTestSuite(TestNavigatorExpression.class);
-        suite.addTestSuite(TestNavigatorParser.class);
-        //
-        suite.addTestSuite(TestJaxbPageModel.class);
-        suite.addTestSuite(TestPageModelDAO.class);
-        suite.addTestSuite(TestPageModelDOM.class);
-        suite.addTestSuite(TestPageModelManager.class);
-        //
-        suite.addTestSuite(TestPermissionDAO.class);
-        suite.addTestSuite(TestRoleDAO.class);
-        suite.addTestSuite(TestRoleManager.class);
+        String testRun = System.getenv("ENTANDO_PIPELINE_TEST_RUN");
 
-        //
-        suite.addTestSuite(TestWidgetTypeDAO.class);
-        suite.addTestSuite(TestWidgetTypeDOM.class);
-        suite.addTestSuite(TestWidgetTypeManager.class);
-        suite.addTestSuite(TestWidgetType.class);
+        if (testRun.equals("test-error-simulation")) {
+            throw new EntRuntimeException("Test error simulation");
+        } else
+        if (testRun.equals("all")) {
+            //
+            suite.addTest(new JUnit4TestAdapter(FileTextReaderTest.class));
+            //
+            suite.addTest(new JUnit4TestAdapter(PageInfoTagTest.class));
+            //
+            suite.addTest(new JUnit4TestAdapter(RestNamedIdTest.class));
+            //
+            suite.addTest(new JUnit4TestAdapter(PageTokenManagerTest.class));
+            //
+            suite.addTestSuite(EntLoggingTest.class);
+            //
+            suite.addTest(new JUnit4TestAdapter(EntSafeXmlUtilsTest.class));
+            //
+            suite.addTest(new JUnit4TestAdapter(InitializerManagerTest.class));
+            suite.addTest(new JUnit4TestAdapter(DatabaseManagerTest.class));
+            //
+            suite.addTestSuite(TestEntityManager.class);
+            //
+            suite.addTestSuite(ApiCatalogManagerIntegrationTest.class);
+            suite.addTest(new JUnit4TestAdapter(ApiCatalogManagerTest.class));
+            //
+            suite.addTestSuite(TestAuthorizationManager.class);
+            suite.addTestSuite(TestAuthorityManager.class);
+            //
+            suite.addTestSuite(TestBaseConfigService.class);
+            suite.addTestSuite(TestConfigItemDAO.class);
+            //
+            suite.addTestSuite(CacheInfoManagerIntegrationTest.class);
+            suite.addTest(new JUnit4TestAdapter(CacheInfoManagerTest.class));
+            //
+            suite.addTestSuite(TestCategoryManager.class);
+            //
+            suite.addTestSuite(TestGroupManager.class);
+            suite.addTestSuite(TestGroupUtilizer.class);
+            //
+            suite.addTestSuite(I18nManagerIntegrationTest.class);
+            suite.addTest(new JUnit4TestAdapter(I18nManagerTest.class));
+            suite.addTest(new JUnit4TestAdapter(I18nManagerCacheWrapperTest.class));
+            //
+            suite.addTestSuite(TestKeyGeneratorDAO.class);
+            suite.addTestSuite(KeyGeneratorManagerIntegrationTest.class);
+            //
+            suite.addTestSuite(LangManagerIntegrationTest.class);
+            suite.addTest(new JUnit4TestAdapter(LangManagerTest.class));
+            //
+            suite.addTestSuite(TestPageManager.class);
+            suite.addTestSuite(TestNavigatorExpression.class);
+            suite.addTestSuite(TestNavigatorParser.class);
+            //
+            suite.addTestSuite(TestJaxbPageModel.class);
+            suite.addTestSuite(TestPageModelDAO.class);
+            suite.addTestSuite(TestPageModelDOM.class);
+            suite.addTestSuite(TestPageModelManager.class);
+            //
+            suite.addTestSuite(TestPermissionDAO.class);
+            suite.addTestSuite(TestRoleDAO.class);
+            suite.addTestSuite(TestRoleManager.class);
 
-        //
-        suite.addTestSuite(TestURLManager.class);
-        //
-        suite.addTestSuite(AuthenticationProviderManagerIntegrationTest.class);
-        suite.addTest(new JUnit4TestAdapter(AuthenticationProviderManagerTest.class));
-        suite.addTestSuite(UserDAOIntegrationTest.class);
-        suite.addTestSuite(UserManagerIntegrationTest.class);
-        suite.addTest(new JUnit4TestAdapter(UserManagerTest.class));
-        //
-        suite.addTestSuite(TestApplicationContext.class);
-        //
-        suite.addTestSuite(TestHtmlHandler.class);
-        //
-        suite.addTestSuite(TestActionLogDAO.class);
-        suite.addTestSuite(TestActionLogManager.class);
-        //
-        suite.addTestSuite(LocalStorageManagerIntegrationTest.class);
-        suite.addTest(new JUnit4TestAdapter(StorageManagerUtilTest.class));
-        //
-        suite.addTestSuite(TestApiUserProfileInterface.class);
-        suite.addTestSuite(UserProfileManagerIntegrationTest.class);
-        suite.addTestSuite(org.entando.entando.aps.system.services.userprofile.TestUserManager.class);
-        suite.addTest(new JUnit4TestAdapter(UserProfileManagerTest.class));
-        suite.addTest(new JUnit4TestAdapter(UserProfileManagerAspectTest.class));
-        suite.addTest(new JUnit4TestAdapter(UserProfileTypeServiceTest.class));
-        suite.addTest(new JUnit4TestAdapter(ValidateUserProfileIntegrationTest.class));
-        //
-        suite.addTestSuite(GuiFragmentManagerIntegrationTest.class);
-        //
-        suite.addTestSuite(TestApiWidgetTypeInterface.class);
-        suite.addTestSuite(TestApiI18nLabelInterface.class);
-        //
-        suite.addTestSuite(TestQueryExtractor.class);
-        // DATA OBJECT
-        suite.addTestSuite(DataObjectModelDAOIntegrationTest.class);
-        suite.addTestSuite(DataObjectModelManagerIntegrationTest.class);
-        suite.addTest(new JUnit4TestAdapter(DataObjectModelManagerTest.class));
-        suite.addTest(new JUnit4TestAdapter(DataObjectMapperCacheWrapperTest.class));
-        suite.addTest(new JUnit4TestAdapter(DataObjectMapperManagerTest.class));
-        suite.addTestSuite(TestDataObjectAuthorization.class);
-        suite.addTestSuite(TestDataObjectEntityManager.class);
-        suite.addTestSuite(TestDataObjectDOM.class);
-        suite.addTestSuite(TestApiDataObjectInterface.class);
+            //
+            suite.addTestSuite(TestWidgetTypeDAO.class);
+            suite.addTestSuite(TestWidgetTypeDOM.class);
+            suite.addTestSuite(TestWidgetTypeManager.class);
+            suite.addTestSuite(TestWidgetType.class);
 
-        suite.addTestSuite(TestDataObjectListHelper.class);
-        suite.addTestSuite(TestDataObjectViewerHelper.class);
+            //
+            suite.addTestSuite(TestURLManager.class);
+            //
+            suite.addTestSuite(AuthenticationProviderManagerIntegrationTest.class);
+            suite.addTest(new JUnit4TestAdapter(AuthenticationProviderManagerTest.class));
+            suite.addTestSuite(UserDAOIntegrationTest.class);
+            suite.addTestSuite(UserManagerIntegrationTest.class);
+            suite.addTest(new JUnit4TestAdapter(UserManagerTest.class));
+            //
+            suite.addTestSuite(TestApplicationContext.class);
+            //
+            suite.addTestSuite(TestHtmlHandler.class);
+            //
+            suite.addTestSuite(TestActionLogDAO.class);
+            suite.addTestSuite(TestActionLogManager.class);
+            //
+            suite.addTestSuite(LocalStorageManagerIntegrationTest.class);
+            suite.addTest(new JUnit4TestAdapter(StorageManagerUtilTest.class));
+            //
+            suite.addTestSuite(TestApiUserProfileInterface.class);
+            suite.addTestSuite(UserProfileManagerIntegrationTest.class);
+            suite.addTestSuite(org.entando.entando.aps.system.services.userprofile.TestUserManager.class);
+            suite.addTest(new JUnit4TestAdapter(UserProfileManagerTest.class));
+            suite.addTest(new JUnit4TestAdapter(UserProfileManagerAspectTest.class));
+            suite.addTest(new JUnit4TestAdapter(UserProfileTypeServiceTest.class));
+            suite.addTest(new JUnit4TestAdapter(ValidateUserProfileIntegrationTest.class));
+            //
+            suite.addTestSuite(GuiFragmentManagerIntegrationTest.class);
+            //
+            suite.addTestSuite(TestApiWidgetTypeInterface.class);
+            suite.addTestSuite(TestApiI18nLabelInterface.class);
+            //
+            suite.addTestSuite(TestQueryExtractor.class);
+            // DATA OBJECT
+            suite.addTestSuite(DataObjectModelDAOIntegrationTest.class);
+            suite.addTestSuite(DataObjectModelManagerIntegrationTest.class);
+            suite.addTest(new JUnit4TestAdapter(DataObjectModelManagerTest.class));
+            suite.addTest(new JUnit4TestAdapter(DataObjectMapperCacheWrapperTest.class));
+            suite.addTest(new JUnit4TestAdapter(DataObjectMapperManagerTest.class));
+            suite.addTestSuite(TestDataObjectAuthorization.class);
+            suite.addTestSuite(TestDataObjectEntityManager.class);
+            suite.addTestSuite(TestDataObjectDOM.class);
+            suite.addTestSuite(TestApiDataObjectInterface.class);
 
-        suite.addTestSuite(TestDataObjectDAO.class);
-        suite.addTestSuite(TestDataObjectManager.class);
-        suite.addTest(new JUnit4TestAdapter(DataObjectManagerTest.class));
-        suite.addTestSuite(TestDataObjectSearcherDAO.class);
-        suite.addTestSuite(TestValidateDataObject.class);
-        suite.addTestSuite(TestUtilizer.class);
-        suite.addTestSuite(TestDataObjectDispenser.class);
+            suite.addTestSuite(TestDataObjectListHelper.class);
+            suite.addTestSuite(TestDataObjectViewerHelper.class);
 
-        suite.addTestSuite(TestSearchEngineManager.class);
+            suite.addTestSuite(TestDataObjectDAO.class);
+            suite.addTestSuite(TestDataObjectManager.class);
+            suite.addTest(new JUnit4TestAdapter(DataObjectManagerTest.class));
+            suite.addTestSuite(TestDataObjectSearcherDAO.class);
+            suite.addTestSuite(TestValidateDataObject.class);
+            suite.addTestSuite(TestUtilizer.class);
+            suite.addTestSuite(TestDataObjectDispenser.class);
 
-        suite.addTestSuite(OAuthConsumerManagerIntegrationTest.class);
-        suite.addTest(new JUnit4TestAdapter(OAuthConsumerManagerTest.class));
-        suite.addTest(new JUnit4TestAdapter(OAuthConsumerDAOTest.class));
-        suite.addTest(new JUnit4TestAdapter(OAuth2TokenDAOTest.class));
-        suite.addTest(new JUnit4TestAdapter(ApiOAuth2TokenManagerTest.class));
+            suite.addTestSuite(TestSearchEngineManager.class);
 
-        suite.addTest(ServicesAllTests.suite());
-        suite.addTest(ControllersAllTests.suite());
-        suite.addTest(new JUnit4TestAdapter(AuthorizationServerConfigurationTest.class));
+            suite.addTestSuite(OAuthConsumerManagerIntegrationTest.class);
+            suite.addTest(new JUnit4TestAdapter(OAuthConsumerManagerTest.class));
+            suite.addTest(new JUnit4TestAdapter(OAuthConsumerDAOTest.class));
+            suite.addTest(new JUnit4TestAdapter(OAuth2TokenDAOTest.class));
+            suite.addTest(new JUnit4TestAdapter(ApiOAuth2TokenManagerTest.class));
 
-        suite.addTest(new JUnit4TestAdapter(FilterUtilsTest.class));
-        suite.addTest(new JUnit4TestAdapter(AbstractEntityTypeServiceTest.class));
+            suite.addTest(ServicesAllTests.suite());
+            suite.addTest(ControllersAllTests.suite());
+            suite.addTest(new JUnit4TestAdapter(AuthorizationServerConfigurationTest.class));
 
-        suite.addTest(new JUnit4TestAdapter(DefaultTextEncryptorTest.class));
-        suite.addTest(new JUnit4TestAdapter(CompatiblePasswordEncoderTest.class));
-        suite.addTest(new JUnit4TestAdapter(IgnoreJacksonWriteOnlyAccessTest.class));
+            suite.addTest(new JUnit4TestAdapter(FilterUtilsTest.class));
+            suite.addTest(new JUnit4TestAdapter(AbstractEntityTypeServiceTest.class));
 
-        suite.addTest(new JUnit4TestAdapter(CsrfFilterTest.class));
+            suite.addTest(new JUnit4TestAdapter(DefaultTextEncryptorTest.class));
+            suite.addTest(new JUnit4TestAdapter(CompatiblePasswordEncoderTest.class));
+            suite.addTest(new JUnit4TestAdapter(IgnoreJacksonWriteOnlyAccessTest.class));
 
-        suite.addTest(new JUnit4TestAdapter(SwaggerConfigTest.class));
-        suite.addTest(new JUnit4TestAdapter(SwaggerMvcAdapterTest.class));
+            suite.addTest(new JUnit4TestAdapter(CsrfFilterTest.class));
 
-        suite.addTest(new JUnit4TestAdapter(CspNonceTagTest.class));
+            suite.addTest(new JUnit4TestAdapter(SwaggerConfigTest.class));
+            suite.addTest(new JUnit4TestAdapter(SwaggerMvcAdapterTest.class));
+
+            suite.addTest(new JUnit4TestAdapter(CspNonceTagTest.class));
+        } else {
+            suite.addTest(new JUnit4TestAdapter(FileTextReaderTest.class));
+            suite.addTest(new JUnit4TestAdapter(PageInfoTagTest.class));
+        }
 
         return suite;
     }
