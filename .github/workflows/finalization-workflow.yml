@@ -22,7 +22,7 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.ENTANDO_NGPL_SECRET }}
+          token: ${{ secrets.NGPL_TOKEN }}
       - name: Cache Maven packages
         uses: actions/cache@v2
         with:
@@ -39,7 +39,6 @@ jobs:
         run: |
           git config --global user.email "cicd@entando.com"
           git config --global user.name "firegloves"
-          # git config --global user.password ${TOKEN}
 
           # fetch tags
           git fetch --tag &> /dev/null
