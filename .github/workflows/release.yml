@@ -1,4 +1,4 @@
-name: Publish to Entando Nexus
+name: Release
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Dump GitHub context
@@ -38,7 +38,7 @@ jobs:
         env:
           ENTANDO_CORE_BOM_FOLDER: "entando-core-bom"
           ENTANDO_CORE_BOM_REPO_URL: "https://github.com/entando-ngpl/entando-core-bom.git"
-          TOKEN_SECRET: ${{ secrets.ENTANDO_NGPL_SECRET }}
+          TOKEN_SECRET: ${{ secrets.NGPL_TOKEN }}
         run: |
           tagValue=$(echo "${{ github.ref }}" | sed 's/.*\///' | sed 's/^v\(.*\)/\1/')
           echo "TAG VALUE $tagValue"
