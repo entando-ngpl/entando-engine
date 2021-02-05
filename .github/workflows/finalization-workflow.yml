@@ -45,10 +45,9 @@ jobs:
 
           # set version
           # TODO switch next 2 lines and check that the new solution works. the first returns a text ordered list (not numeric)
-          # lastTag=$( git tag -l | tail -1 )
           lastTag=$(git describe --tags $(git rev-list --tags --max-count=1) | sed 's/^v\(.*\)/\1/')
           # if there isn't an existing tag => set a default value to 0.0.0
-          if [[ -z "$lastTag" ]] then
+          if [[ -z "$lastTag" ]]; then
             lastTag="v0.0.0"
           fi
 
