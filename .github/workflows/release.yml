@@ -71,6 +71,8 @@ jobs:
 
           echo "UPDATING entando-core-bom pom.xml file..."
 
+          # TODO check if new version is newer?
+
           # update the version of the current project in the entando-core-bom pom.xml file
           xmlstarlet ed --inplace -P -N pom=http://maven.apache.org/POM/4.0.0 \
               --update "/pom:project/pom:properties/pom:$artifactId.version" \

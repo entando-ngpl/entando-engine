@@ -36,6 +36,7 @@ jobs:
       - name: "Derive and set version"
         env:
           TMPDIR: "/home/runner/work/_temp"
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           git config --global user.email "cicd@entando.com"
           git config --global user.name "firegloves"
@@ -45,10 +46,9 @@ jobs:
 
           # set version
           # TODO switch next 2 lines and check that the new solution works. the first returns a text ordered list (not numeric)
-          # lastTag=$( git tag -l | tail -1 )
           lastTag=$(git describe --tags $(git rev-list --tags --max-count=1) | sed 's/^v\(.*\)/\1/')
           # if there isn't an existing tag => set a default value to 0.0.0
-          if [[ -z "$lastTag" ]] then
+          if [[ -z "$lastTag" ]]; then
             lastTag="v0.0.0"
           fi
 
@@ -80,6 +80,6 @@ jobs:
           git push --tags
 
           # delete branches
-          git checkout master
+          git checkout "$DEFAULT_BRANCH"
           git push -d origin "$BRANCH_NAME"
           git branch -D "$BRANCH_NAME"
