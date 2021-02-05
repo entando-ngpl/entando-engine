@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  release:
+  finalize:
     env:
       CLONE_URL: ${{ github.event.pull_request.base.repo.clone_url }}
       BRANCH_NAME: ${{ github.head_ref }}
