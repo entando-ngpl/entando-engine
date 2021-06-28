@@ -6,7 +6,7 @@ name: Finalization
 on:
   push:
     branches:
-      - master
+      - xxxmaster
 
 jobs:
   finalize:
