@@ -539,22 +539,23 @@
             </distributionManagement>
         </profile>
 
-        <!--        <profile>-->
-        <!--            <id>maven-central-repository</id>-->
-        <!--            <activation>-->
-        <!--                <property>-->
-        <!--                    <name>!useInternalRepo</name>-->
-        <!--                </property>-->
-        <!--            </activation>-->
-        <!--            <properties>-->
-        <!--            </properties>-->
-        <!--            <distributionManagement>-->
-        <!--                <repository>-->
-        <!--                    <id>oss.sonatype.org</id>-->
-        <!--                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
-        <!--                </repository>-->
-        <!--            </distributionManagement>-->
-        <!--        </profile>-->
+        <profile>
+            <id>maven-central-repository</id>
+            <activation>
+                <property>
+                    <name>useInternalRepo</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+            </properties>
+            <distributionManagement>
+                <repository>
+                    <id>oss.sonatype.org</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
     </profiles>
 
 </project>
