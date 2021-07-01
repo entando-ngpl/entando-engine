@@ -13,6 +13,7 @@
  */
 package org.entando.entando.web.page;
 
+import com.agiletec.aps.system.services.page.IPage;
 import com.agiletec.aps.system.services.role.Permission;
 import com.agiletec.aps.system.services.user.UserDetails;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -238,7 +239,7 @@ public class PageController {
 
 
     @ActivityStreamAuditable
-    @RestAccessControl(permission = Permission.MANAGE_PAGES)
+    @RestAccessControl(permission = {Permission.MANAGE_PAGES, Permission.CONTENT_SUPERVISOR})
     @RequestMapping(value = "/pages/{pageCode}/status", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RestResponse<PageDto, Map<String, String>>> updatePageStatus(
             @ModelAttribute("user") UserDetails user, @PathVariable String pageCode,
@@ -275,8 +276,19 @@ public class PageController {
         if (bindingResult.hasErrors()) {
             throw new ValidationConflictException(bindingResult);
         }
+
+        validatePagePlacement(pageRequest, bindingResult);
+
         PageDto dto = this.getPageService().addPage(pageRequest);
         return new ResponseEntity<>(new SimpleRestResponse<>(dto), HttpStatus.OK);
+    }
+
+    private void validatePagePlacement(PageRequest pageRequest, BindingResult bindingResult) {
+        IPage parent = pageValidator.getDraftPage(pageRequest.getParentCode());
+        pageValidator.validateGroups(pageRequest.getOwnerGroup(), parent.getGroup(), bindingResult);
+        if (bindingResult.hasErrors()) {
+            throw new ValidationGenericException(bindingResult);
+        }
     }
 
     @ActivityStreamAuditable

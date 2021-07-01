@@ -13,8 +13,6 @@
  */
 package org.entando.entando.web.utils;
 
-import org.entando.entando.ent.exception.EntException;
-import java.util.Calendar;
 import com.agiletec.aps.system.services.authorization.Authorization;
 import com.agiletec.aps.system.services.authorization.AuthorizationManager;
 import com.agiletec.aps.system.services.authorization.IAuthorizationManager;
@@ -27,12 +25,17 @@ import com.agiletec.aps.system.services.user.UserDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.entando.entando.aps.system.services.oauth2.IApiOAuth2TokenManager;
 import org.entando.entando.aps.system.services.oauth2.model.OAuth2AccessTokenImpl;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import org.entando.entando.aps.system.services.userprofile.model.IUserProfile;
+import org.entando.entando.ent.exception.EntException;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.when;
 import org.springframework.security.oauth2.common.DefaultOAuth2RefreshToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+
+import java.util.Calendar;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 public class OAuth2TestUtils {
 
@@ -95,7 +98,7 @@ public class OAuth2TestUtils {
             String accessToken = OAuth2TestUtils.getValidAccessToken();
             when(apiOAuth2TokenManager.readAccessToken(Mockito.anyString())).thenReturn(OAuth2TestUtils.getOAuth2Token(user.getUsername(), accessToken));
             when(authenticationProviderManager.getUser(user.getUsername())).thenReturn(user);
-            when(authorizationManager.isAuthOnPermission(any(UserDetails.class), anyString())).then(invocation -> {
+            Mockito.lenient().when(authorizationManager.isAuthOnPermission(any(UserDetails.class), anyString())).then(invocation -> {
                 UserDetails user1 = (UserDetails) invocation.getArguments()[0];
                 String permissionName = (String) invocation.getArguments()[1];
                 return new AuthorizationManager().isAuthOnPermission(user1, permissionName);
@@ -127,6 +130,11 @@ public class OAuth2TestUtils {
         public UserBuilder grantedToRoleAdmin() {
 
             OAuth2TestUtils.addAuthorization(this.user, "administrators", "admin", new String[]{Permission.SUPERUSER});
+            return this;
+        }
+
+        public UserBuilder withUserProfile(IUserProfile userProfile) {
+            this.user.setProfile(userProfile);
             return this;
         }
 

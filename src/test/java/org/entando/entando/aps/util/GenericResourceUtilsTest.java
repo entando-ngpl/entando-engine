@@ -2,12 +2,13 @@ package org.entando.entando.aps.util;
 
 import java.util.Arrays;
 import java.util.List;
-import junit.framework.TestCase;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class GenericResourceUtilsTest extends TestCase {
+class GenericResourceUtilsTest {
 
-    public void testIsResourceLinkableByContent() {
+    @Test
+    void testIsResourceLinkableByContent() {
         int d0 = -1, d1 = -1, d2 = -1, d3 = -1;
         int e0 = TD.GROUPS.length, e1 = TD.GROUPS[1].length, e2 = TD.GROUPS[2].length, e3 = TD.GROUPS[3].length;
 
@@ -37,12 +38,12 @@ public class GenericResourceUtilsTest extends TestCase {
 
                             boolean expectedRes = TD.truthTable_resourceLinkability[d0][d1][d2][d3];
 
-                            Assert.assertEquals(expectedRes, actualRes);
+                            Assertions.assertEquals(expectedRes, actualRes);
                         }
                     }
                 }
             }
-        } catch (java.lang.AssertionError ex) {
+        } catch (AssertionError ex) {
             System.err.println("\nAt coordinates:\nCO[\n"
                     + "\t" + TD.GROUPS[0][d0] + "(" + d0 + ")\n"
                     + "\t" + TD.GROUPS[1][d1] + "(" + d1 + ")\n]\nRE[\n"

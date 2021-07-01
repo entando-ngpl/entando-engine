@@ -562,7 +562,7 @@ public class PageDAO extends AbstractDAO implements IPageDAO {
                 String extraConfig = this.getExtraConfig(pageMetadata);
                 stat.setString(index++, extraConfig);
                 Date updatedAt = pageMetadata.getUpdatedAt() != null ? pageMetadata.getUpdatedAt() : new Date();
-                stat.setTimestamp(index++, updatedAt != null ? new java.sql.Timestamp(updatedAt.getTime()) : null);
+                stat.setTimestamp(index++, updatedAt != null ? new Timestamp(updatedAt.getTime()) : null);
                 if (!isAdd) {
                     stat.setString(index++, pageCode);
                 }

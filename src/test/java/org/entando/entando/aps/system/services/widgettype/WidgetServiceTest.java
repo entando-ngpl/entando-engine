@@ -31,6 +31,7 @@ import org.entando.entando.aps.system.services.mockhelper.WidgetMockHelper;
 import org.entando.entando.aps.system.services.page.IPageService;
 import org.entando.entando.aps.system.services.widgettype.model.WidgetDto;
 import org.entando.entando.aps.system.services.widgettype.model.WidgetDtoBuilder;
+import org.entando.entando.ent.exception.EntException;
 import org.entando.entando.web.common.assembler.PagedMetadataMapper;
 import org.entando.entando.web.common.model.Filter;
 import org.entando.entando.web.common.model.FilterOperator;
@@ -39,14 +40,15 @@ import org.entando.entando.web.common.model.RestListRequest;
 import org.entando.entando.web.component.ComponentUsageEntity;
 import org.entando.entando.web.page.model.PageSearchRequest;
 import org.entando.entando.web.widget.model.WidgetRequest;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,13 +56,13 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class WidgetServiceTest {
+@ExtendWith(MockitoExtension.class)
+class WidgetServiceTest {
 
     private static final String WIDGET_1_CODE = "widget1";
     private static final String WIDGET_2_CODE = "widget2";
@@ -96,11 +98,11 @@ public class WidgetServiceTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
-        when(pageManager.getOnlineWidgetUtilizers(WIDGET_1_CODE)).thenReturn(ImmutableList.of(new Page()));
-        when(pageManager.getDraftWidgetUtilizers(WIDGET_1_CODE)).thenReturn(ImmutableList.of(new Page()));
+        Mockito.lenient().when(pageManager.getOnlineWidgetUtilizers(WIDGET_1_CODE)).thenReturn(ImmutableList.of(new Page()));
+        Mockito.lenient().when(pageManager.getDraftWidgetUtilizers(WIDGET_1_CODE)).thenReturn(ImmutableList.of(new Page()));
 
         WidgetDtoBuilder dtoBuilder = new WidgetDtoBuilder();
         dtoBuilder.setPageManager(pageManager);
@@ -108,11 +110,11 @@ public class WidgetServiceTest {
         dtoBuilder.setStockWidgetCodes("");
         widgetService.setDtoBuilder(dtoBuilder);
 
-        when(widgetManager.getWidgetTypes()).thenReturn(ImmutableList.of(getWidget1(), getWidget2()));
+        Mockito.lenient().when(widgetManager.getWidgetTypes()).thenReturn(ImmutableList.of(getWidget1(), getWidget2()));
     }
 
     @Test
-    public void shouldReturnAll() {
+    void shouldReturnAll() {
         PagedMetadata<WidgetDto> result = widgetService.getWidgets(new RestListRequest());
 
         assertThat(result.getBody()).hasSize(2);
@@ -125,7 +127,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldFilterByCode() {
+    void shouldFilterByCode() {
 
         RestListRequest requestList = new RestListRequest();
         Filter filter = new Filter();
@@ -139,7 +141,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldFilterByUsed() {
+    void shouldFilterByUsed() {
         RestListRequest requestList = new RestListRequest();
         Filter filter = new Filter();
         filter.setAttribute("used");
@@ -153,7 +155,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldFilterByTypology() {
+    void shouldFilterByTypology() {
 
         RestListRequest requestList = new RestListRequest();
         Filter filter = new Filter();
@@ -167,7 +169,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldFilterByGroup() {
+    void shouldFilterByGroup() {
 
         RestListRequest requestList = new RestListRequest();
         Filter filter = new Filter();
@@ -181,7 +183,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldSortByCode() {
+    void shouldSortByCode() {
         RestListRequest requestList = new RestListRequest();
 
         PagedMetadata<WidgetDto> result = widgetService.getWidgets(requestList);
@@ -191,7 +193,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldSortByUsed() {
+    void shouldSortByUsed() {
         RestListRequest requestList = new RestListRequest();
         requestList.setSort("used");
 
@@ -202,7 +204,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldSortByTypology() {
+    void shouldSortByTypology() {
         RestListRequest requestList = new RestListRequest();
         requestList.setSort("typology");
         requestList.setDirection("DESC");
@@ -214,7 +216,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldSortByGroup() {
+    void shouldSortByGroup() {
         RestListRequest requestList = new RestListRequest();
         requestList.setSort("typology");
         requestList.setDirection("DESC");
@@ -226,7 +228,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldAddNewWidget() throws Exception {
+    void shouldAddNewWidget() throws Exception {
         // Given
         String expectedCustomUi = "<#assign wp=JspTaglibs[ \"/aps-core\"]>\n"
                 + "<script nonce=\"<@wp.cspNonce />\">my_js_script</script>";
@@ -251,7 +253,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldUpdateWidget() throws Exception {
+    void shouldUpdateWidget() throws Exception {
         // Given
         String expectedCustomUi = "<#assign wp=JspTaglibs[ \"/aps-core\"]>\n"
                 + "<script nonce=\"<@wp.cspNonce />\">my_js_script</script>";
@@ -269,7 +271,7 @@ public class WidgetServiceTest {
         ArgumentCaptor<String> configUiCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> bundleIdCaptor = ArgumentCaptor.forClass(String.class);
         verify(widgetManager).updateWidgetType(anyString(), any(), any(), anyString(), configUiCaptor.capture(),
-                bundleIdCaptor.capture(), anyBoolean(), anyString());
+                bundleIdCaptor.capture(), anyBoolean(), anyString(), anyString());
         assertThat(configUiCaptor.getValue()).isEqualTo(objectMapper.writeValueAsString(widgetRequest.getConfigUi()));
         assertThat(bundleIdCaptor.getValue()).isEqualTo(widgetRequest.getBundleId());
 
@@ -280,7 +282,7 @@ public class WidgetServiceTest {
     }
 
     @Test
-    public void shouldNotUpdateWidgetCustomUiNonce() throws Exception {
+    void shouldNotUpdateWidgetCustomUiNonce() throws Exception {
         // Given
         String expectedCustomUi = "<#assign wp=JspTaglibs[ \"/aps-core\"]>\n<script nonce=\"<@wp.cspNonce />\">my_js_script</script>";
         WidgetRequest widgetRequest = getWidgetRequest1();
@@ -298,7 +300,7 @@ public class WidgetServiceTest {
         ArgumentCaptor<String> configUiCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> bundleIdCaptor = ArgumentCaptor.forClass(String.class);
         verify(widgetManager).updateWidgetType(anyString(), any(), any(), anyString(), configUiCaptor.capture(),
-                bundleIdCaptor.capture(), anyBoolean(), anyString());
+                bundleIdCaptor.capture(), anyBoolean(), anyString(), anyString());
         assertThat(configUiCaptor.getValue()).isEqualTo(objectMapper.writeValueAsString(widgetRequest.getConfigUi()));
         assertThat(bundleIdCaptor.getValue()).isEqualTo(widgetRequest.getBundleId());
 
@@ -342,12 +344,13 @@ public class WidgetServiceTest {
         widgetRequest.setConfigUi(ImmutableMap.of(CUSTOM_ELEMENT_KEY, CUSTOM_ELEMENT_1, RESOURCES_KEY, RESOURCES_1));
         widgetRequest.setBundleId(BUNDLE_1);
         widgetRequest.setWidgetCategory("test");
+        widgetRequest.setIcon("test");
         return widgetRequest;
     }
 
 
     @Test
-    public void getWidgetUsageForNonExistingCodeShouldReturnZero() {
+    void getWidgetUsageForNonExistingCodeShouldReturnZero() {
 
         int componentUsage = widgetService.getComponentUsage("non_existing");
         assertEquals(0, componentUsage);
@@ -356,7 +359,7 @@ public class WidgetServiceTest {
 
 
     @Test
-    public void getWidgetUsageDetails() throws Exception {
+    void getWidgetUsageDetails() throws Exception {
 
         this.mockPagedMetadata(Arrays.asList(PageMockHelper.PAGE_CODE), 1, 1, 100, 2);
 
@@ -367,7 +370,7 @@ public class WidgetServiceTest {
 
 
     @Test
-    public void getWidgetUsageDetailsWithPagination() throws Exception {
+    void getWidgetUsageDetailsWithPagination() throws Exception {
 
         int pageSize = 3;
 
@@ -403,7 +406,7 @@ public class WidgetServiceTest {
 
 
     @Test
-    public void getWidgetUsageDetailsWithInvalidCodeShouldThrowResourceNotFoundException() throws Exception {
+    void getWidgetUsageDetailsWithInvalidCodeShouldThrowResourceNotFoundException() throws Exception {
 
         Page page1 = PageMockHelper.mockTestPage(PageMockHelper.PAGE_MISSION_CODE, WidgetMockHelper.WIDGET_1_CODE);
         Page page2 = PageMockHelper.mockTestPage(PageMockHelper.PAGE_CODE, WidgetMockHelper.WIDGET_1_CODE);
@@ -423,6 +426,33 @@ public class WidgetServiceTest {
                         assertTrue(e instanceof NoSuchElementException || e instanceof NullPointerException);
                     }
                 });
+    }
+
+    @Test
+    void shouldNotThrowExceptionIfWidgetItsBroken() throws Exception {
+
+        WidgetService service = new WidgetService();
+        service.setWidgetManager(widgetManager);
+
+        WidgetDtoBuilder dtoBuilder = new WidgetDtoBuilder();
+        dtoBuilder.setPageManager(pageManager);
+        dtoBuilder.setComponentManager(componentManager);
+        dtoBuilder.setStockWidgetCodes("");
+        service.setDtoBuilder(dtoBuilder);
+
+        Mockito.lenient().when(pageManager.getOnlineWidgetUtilizers(WIDGET_1_CODE)).thenThrow(new EntException("Failure"));
+        Mockito.lenient().when(pageManager.getDraftWidgetUtilizers(WIDGET_1_CODE)).thenThrow(new EntException("Failure"));
+        Mockito.lenient().when(widgetManager.getWidgetTypes()).thenReturn(ImmutableList.of(getWidget1(), getWidget2()));
+
+        RestListRequest requestList = new RestListRequest();
+        Filter filter = new Filter();
+        filter.setAttribute("used");
+        filter.setValue("1");
+        filter.setOperator(FilterOperator.EQUAL.getValue());
+        requestList.addFilter(filter);
+
+        PagedMetadata<WidgetDto> result = service.getWidgets(requestList);
+        assertThat(result.getBody()).hasSize(0);
     }
 
 
@@ -457,10 +487,9 @@ public class WidgetServiceTest {
             pagedMetadata.setPageSize(pageSize);
             pagedMetadata.setPage(currPage);
             pagedMetadata.imposeLimits();
-            when(pagedMetadataMapper.getPagedResult(any(), any())).thenReturn(pagedMetadata);
-
+            Mockito.lenient().when(pagedMetadataMapper.getPagedResult(any(), any())).thenReturn(pagedMetadata);
         } catch (Exception e) {
-            Assert.fail("Mock Exception");
+            Assertions.fail("Mock Exception");
         }
     }
 }

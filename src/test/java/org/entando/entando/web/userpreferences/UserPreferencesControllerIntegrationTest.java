@@ -13,14 +13,8 @@
  */
 package org.entando.entando.web.userpreferences;
 
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.fail;
-import static org.hamcrest.CoreMatchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,11 +30,12 @@ import org.entando.entando.aps.system.services.userpreferences.IUserPreferencesM
 import org.entando.entando.web.AbstractControllerIntegrationTest;
 import org.entando.entando.web.utils.OAuth2TestUtils;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-public class UserPreferencesControllerIntegrationTest extends AbstractControllerIntegrationTest {
+class UserPreferencesControllerIntegrationTest extends AbstractControllerIntegrationTest {
 
     @Autowired
     private IUserManager userManager;
@@ -48,7 +43,7 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
     private IUserPreferencesManager userPreferencesManager;
 
     @Test
-    public void testGetWithUnknownUser() throws Exception {
+    void testGetWithUnknownUser() throws Exception {
         String username = "unknown_user";
         UserDetails user = new OAuth2TestUtils.UserBuilder(username, "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
@@ -66,7 +61,7 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
     }
 
     @Test
-    public void testGetUsersPreferencesWithAdminPrivileges() throws Exception {
+    void testGetUsersPreferencesWithAdminPrivileges() throws Exception {
         String username = "user_with_admin_privileges";
 
         try {
@@ -90,7 +85,7 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
     }
 
     @Test
-    public void testGetUsersPreferencesWithoutPrivileges() throws Exception {
+    void testGetUsersPreferencesWithoutPrivileges() throws Exception {
         String username = "user_without_privileges";
 
         try {
@@ -114,7 +109,7 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
     }
 
     @Test
-    public void testUpdateWithUnknownUser() throws Exception {
+    void testUpdateWithUnknownUser() throws Exception {
         String username = "unknown_user";
         UserDetails user = new OAuth2TestUtils.UserBuilder(username, "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
@@ -135,7 +130,7 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
     }
 
     @Test
-    public void testUpdateUsersPreferencesWithAdminPrivileges() throws Exception {
+    void testUpdateUsersPreferencesWithAdminPrivileges() throws Exception {
         String username = "user_with_admin_privileges";
 
         try {
@@ -159,7 +154,7 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
     }
 
     @Test
-    public void testUpdateUsersPreferencesWithoutPrivileges() throws Exception {
+    void testUpdateUsersPreferencesWithoutPrivileges() throws Exception {
         String username = "user_without_privileges";
 
         try {
@@ -183,7 +178,7 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
     }
 
     @Test
-    public void testUpdateUsersPreferencesComplete() throws Exception {
+    void testUpdateUsersPreferencesComplete() throws Exception {
         String username = "user_complete_update";
 
         try {
@@ -199,7 +194,13 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.payload.wizard", Matchers.is(true)))
                     .andExpect(jsonPath("$.payload.loadOnPageSelect", Matchers.is(true)))
-                    .andExpect(jsonPath("$.payload.translationWarning", Matchers.is(true)));
+                    .andExpect(jsonPath("$.payload.translationWarning", Matchers.is(true)))
+                    .andExpect(jsonPath("$.payload.defaultPageOwnerGroup", Matchers.isEmptyOrNullString()))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups", Matchers.isEmptyOrNullString()))
+                    .andExpect(jsonPath("$.payload.defaultContentOwnerGroup", Matchers.isEmptyOrNullString()))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups", Matchers.isEmptyOrNullString()))
+                    .andExpect(jsonPath("$.payload.defaultWidgetOwnerGroup", Matchers.isEmptyOrNullString()))
+                    .andExpect(jsonPath("$.payload.defaultWidgetJoinGroups", Matchers.isEmptyOrNullString()));
 
             InputStream file = this.getClass().getResourceAsStream("2_PUT_user_preferences.json");
             String bodyRequest = FileTextReader.getText(file);
@@ -213,7 +214,23 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.payload.wizard", Matchers.is(false)))
                     .andExpect(jsonPath("$.payload.loadOnPageSelect", Matchers.is(false)))
-                    .andExpect(jsonPath("$.payload.translationWarning", Matchers.is(false)));
+                    .andExpect(jsonPath("$.payload.translationWarning", Matchers.is(false)))
+                    .andExpect(jsonPath("$.payload.defaultPageOwnerGroup", Matchers.is("group1")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups.size()", Matchers.is(4)))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups[0]", Matchers.is("group2")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups[1]", Matchers.is("group3")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups[2]", Matchers.is("group4")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups[3]", Matchers.is("group5")))
+                    .andExpect(jsonPath("$.payload.defaultContentOwnerGroup", Matchers.is("group6")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups.size()", Matchers.is(4)))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups[0]", Matchers.is("group7")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups[1]", Matchers.is("group8")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups[2]", Matchers.is("group9")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups[3]", Matchers.is("group10")))
+                    .andExpect(jsonPath("$.payload.defaultWidgetOwnerGroup", Matchers.is("group2")))
+                    .andExpect(jsonPath("$.payload.defaultWidgetJoinGroups.size()", Matchers.is(2)))
+                    .andExpect(jsonPath("$.payload.defaultWidgetJoinGroups[0]", Matchers.is("group5")))
+                    .andExpect(jsonPath("$.payload.defaultWidgetJoinGroups[1]", Matchers.is("group9")));
 
             mockMvc.perform(
                     get("/userPreferences/{username}", username)
@@ -223,7 +240,59 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.payload.wizard", Matchers.is(false)))
                     .andExpect(jsonPath("$.payload.loadOnPageSelect", Matchers.is(false)))
-                    .andExpect(jsonPath("$.payload.translationWarning", Matchers.is(false)));
+                    .andExpect(jsonPath("$.payload.translationWarning", Matchers.is(false)))
+                    .andExpect(jsonPath("$.payload.defaultPageOwnerGroup", Matchers.is("group1")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups.size()", Matchers.is(4)))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups[0]", Matchers.is("group2")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups[1]", Matchers.is("group3")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups[2]", Matchers.is("group4")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups[3]", Matchers.is("group5")))
+                    .andExpect(jsonPath("$.payload.defaultContentOwnerGroup", Matchers.is("group6")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups.size()", Matchers.is(4)))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups[0]", Matchers.is("group7")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups[1]", Matchers.is("group8")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups[2]", Matchers.is("group9")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups[3]", Matchers.is("group10")))
+                    .andExpect(jsonPath("$.payload.defaultWidgetOwnerGroup", Matchers.is("group2")))
+                    .andExpect(jsonPath("$.payload.defaultWidgetJoinGroups.size()", Matchers.is(2)))
+                    .andExpect(jsonPath("$.payload.defaultWidgetJoinGroups[0]", Matchers.is("group5")))
+                    .andExpect(jsonPath("$.payload.defaultWidgetJoinGroups[1]", Matchers.is("group9")));
+
+            file = this.getClass().getResourceAsStream("9_PUT_user_preferences.json");
+            bodyRequest = FileTextReader.getText(file);
+
+            mockMvc.perform(
+                    put("/userPreferences/{username}", username)
+                            .content(bodyRequest)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .header("Authorization", "Bearer " + accessToken))
+                    .andDo(resultPrint())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.payload.wizard", Matchers.is(false)))
+                    .andExpect(jsonPath("$.payload.loadOnPageSelect", Matchers.is(false)))
+                    .andExpect(jsonPath("$.payload.translationWarning", Matchers.is(false)))
+                    .andExpect(jsonPath("$.payload.defaultPageOwnerGroup", Matchers.is("group1")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups.size()", Matchers.is(0)))
+                    .andExpect(jsonPath("$.payload.defaultContentOwnerGroup", Matchers.is("group6")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups.size()", Matchers.is(0)))
+                    .andExpect(jsonPath("$.payload.defaultWidgetOwnerGroup", Matchers.is("group2")))
+                    .andExpect(jsonPath("$.payload.defaultWidgetJoinGroups.size()", Matchers.is(0)));
+
+            mockMvc.perform(
+                    get("/userPreferences/{username}", username)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .header("Authorization", "Bearer " + accessToken))
+                    .andDo(resultPrint())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.payload.wizard", Matchers.is(false)))
+                    .andExpect(jsonPath("$.payload.loadOnPageSelect", Matchers.is(false)))
+                    .andExpect(jsonPath("$.payload.translationWarning", Matchers.is(false)))
+                    .andExpect(jsonPath("$.payload.defaultPageOwnerGroup", Matchers.is("group1")))
+                    .andExpect(jsonPath("$.payload.defaultPageJoinGroups.size()", Matchers.is(0)))
+                    .andExpect(jsonPath("$.payload.defaultContentOwnerGroup", Matchers.is("group6")))
+                    .andExpect(jsonPath("$.payload.defaultContentJoinGroups.size()", Matchers.is(0)))
+                    .andExpect(jsonPath("$.payload.defaultWidgetOwnerGroup", Matchers.is("group2")))
+                    .andExpect(jsonPath("$.payload.defaultWidgetJoinGroups.size()", Matchers.is(0)));
         } finally {
             this.userManager.removeUser(username);
             this.userPreferencesManager.deleteUserPreferences(username);
@@ -231,7 +300,7 @@ public class UserPreferencesControllerIntegrationTest extends AbstractController
     }
 
     @Test
-    public void testUpdateUsersPreferencesPartial() throws Exception {
+    void testUpdateUsersPreferencesPartial() throws Exception {
         String username = "user_complete_partial";
 
         try {

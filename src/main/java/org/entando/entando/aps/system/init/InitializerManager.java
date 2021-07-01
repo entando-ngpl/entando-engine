@@ -126,8 +126,8 @@ public class InitializerManager extends AbstractInitializerManager implements II
         if (!postProcessStatus.equals(SystemInstallationReport.Status.INIT)) {
             return;
         }
-        String compEnvKey = (AbstractInitializerManager.Environment.test.equals(this.getEnvironment()))
-                ? AbstractInitializerManager.Environment.test.toString() : AbstractInitializerManager.Environment.production.toString();
+        String compEnvKey = (Environment.test.equals(this.getEnvironment()))
+                ? Environment.test.toString() : Environment.production.toString();
         ComponentEnvironment componentEnvironment = (null != component.getEnvironments()) ? component.getEnvironments().get(compEnvKey) : null;
         List<IPostProcess> postProcesses = (null != componentEnvironment) ? componentEnvironment.getPostProcesses() : null;
         if (null == postProcesses || postProcesses.isEmpty()) {

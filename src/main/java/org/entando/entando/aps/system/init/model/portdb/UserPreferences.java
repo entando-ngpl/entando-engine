@@ -43,4 +43,34 @@ public class UserPreferences {
             canBeNull = false)
     private short translationwarning;
 
+    @DatabaseField(columnName = "defaultpageownergroup",
+            dataType = DataType.STRING,
+            width = 64)
+    private String defaultpageownergroup;
+
+    @DatabaseField(columnName = "defaultpagejoingroups",
+            dataType = DataType.STRING,
+            width = 256)
+    private String defaultpagejoingroups;
+
+    @DatabaseField(columnName = "defaultcontentownergroup",
+            dataType = DataType.STRING,
+            width = 64)
+    private String defaultcontentownergroup;
+
+    @DatabaseField(columnName = "defaultcontentjoingroups",
+            dataType = DataType.STRING,
+            width = 256)
+    private String defaultcontentjoingroups;
+
+    @DatabaseField(columnName = "defaultwidgetownergroup",
+            dataType = DataType.STRING,
+            width = 64)
+    private String defaultwidgetownergroup;
+
+    @DatabaseField(columnName = "defaultwidgetjoingroups",
+            dataType = DataType.STRING,
+            width = 256)
+    private String defaultwidgetjoingroups;
+
 }

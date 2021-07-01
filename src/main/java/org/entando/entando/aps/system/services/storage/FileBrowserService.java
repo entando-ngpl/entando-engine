@@ -31,9 +31,11 @@ import org.springframework.validation.BindingResult;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.entando.entando.web.common.exceptions.ValidationGenericException;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -87,23 +89,24 @@ public class FileBrowserService implements IFileBrowserService {
     @Override
     public byte[] getFileStream(String currentPath, Boolean protectedFolder) {
         this.checkResource(currentPath, "File", protectedFolder);
+        File tempDir = new File(FileTextReader.getTempDirectory());
         File tempFile = null;
         byte[] bytes = null;
         try {
             String[] sections = currentPath.split("/");
             InputStream stream = this.getStorageManager().getStream(currentPath, protectedFolder);
             tempFile = FileTextReader.createTempFile(new SecureRandom().nextInt(100) + sections[sections.length - 1], stream);
-            bytes = FileTextReader.fileToByteArray(tempFile);
+            bytes = FileTextReader.fileToByteArray(tempFile, tempDir);
         } catch (Throwable t) {
             logger.error("error extracting stream for path {} - type {}", currentPath, protectedFolder);
             throw new RestServerError("error extracting stream", t);
         } finally {
-            if (null != tempFile) {
-                boolean deleted = tempFile.delete();
-
-                if (!deleted) {
-                    logger.warn("Failed to delete temp file {}", tempFile.getAbsolutePath());
+            try {
+                if (null != tempFile && FileUtils.directoryContains(tempDir, tempFile)) { // security check
+                    FileUtils.forceDelete(tempFile); // NOSONAR
                 }
+            } catch (IOException ex) {
+                logger.error("Error deleting temp file", ex);
             }
         }
         return bytes;

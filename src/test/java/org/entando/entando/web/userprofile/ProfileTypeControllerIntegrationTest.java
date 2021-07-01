@@ -13,41 +13,43 @@
  */
 package org.entando.entando.web.userprofile;
 
-import com.agiletec.aps.system.services.group.Group;
-import com.agiletec.aps.system.services.role.Permission;
-import java.io.InputStream;
-
 import com.agiletec.aps.system.common.entity.IEntityTypesConfigurer;
 import com.agiletec.aps.system.common.entity.model.IApsEntity;
+import com.agiletec.aps.system.common.entity.model.attribute.MonoTextAttribute;
+import com.agiletec.aps.system.common.entity.parse.attribute.MonoTextAttributeHandler;
+import com.agiletec.aps.system.services.authorization.Authorization;
+import com.agiletec.aps.system.services.group.Group;
+import com.agiletec.aps.system.services.role.Permission;
+import com.agiletec.aps.system.services.user.User;
 import com.agiletec.aps.system.services.user.UserDetails;
+import com.agiletec.aps.system.services.user.UserManager;
 import com.agiletec.aps.util.FileTextReader;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.entando.entando.aps.system.services.userprofile.IUserProfileManager;
 import org.entando.entando.aps.system.services.userprofile.IUserProfileTypeService;
+import org.entando.entando.aps.system.services.userprofile.model.IUserProfile;
 import org.entando.entando.aps.system.services.userprofile.model.UserProfile;
 import org.entando.entando.web.AbstractControllerIntegrationTest;
+import org.entando.entando.web.userprofile.model.ProfileTypeRefreshRequest;
 import org.entando.entando.web.utils.OAuth2TestUtils;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import java.io.InputStream;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.entando.entando.web.userprofile.model.ProfileTypeRefreshRequest;
-
-public class ProfileTypeControllerIntegrationTest extends AbstractControllerIntegrationTest {
+class ProfileTypeControllerIntegrationTest extends AbstractControllerIntegrationTest {
 
     @Autowired
     private IUserProfileTypeService userProfileTypeService;
@@ -56,11 +58,14 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     private IUserProfileManager userProfileManager;
 
     @Autowired
+    private UserManager userManager;
+
+    @Autowired
     @InjectMocks
     private ProfileTypeController controller;
     
     @Test
-    public void testGetUserProfileTypes() throws Exception {
+    void testGetUserProfileTypes() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -71,7 +76,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testGetValidUserProfileType() throws Exception {
+    void testGetValidUserProfileType() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -81,7 +86,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testGetInvalidUserProfileType() throws Exception {
+    void testGetInvalidUserProfileType() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -91,8 +96,8 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testAddInvalidProfileType() throws Exception {
-        Assert.assertNull(this.userProfileManager.getEntityPrototype("XXX"));
+    void testAddInvalidProfileType() throws Exception {
+        Assertions.assertNull(this.userProfileManager.getEntityPrototype("XXX"));
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         String body1 = "{\"code\": \"XXX\", \"name\": \"\", \"attributes\": []}";
@@ -115,18 +120,18 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testAddGetUserProfileType_1() throws Exception {
+    void testAddGetUserProfileType_1() throws Exception {
         try {
-            Assert.assertNull(this.userProfileManager.getEntityPrototype("TST"));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype("TST"));
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
 
             this.executeProfileTypePost("2_POST_valid.json", accessToken, status().isOk());
 
             UserProfile addedType = (UserProfile) this.userProfileManager.getEntityPrototype("TST");
-            Assert.assertNotNull(addedType);
-            Assert.assertEquals("Profile Type TST", addedType.getTypeDescription());
-            Assert.assertEquals(3, addedType.getAttributeList().size());
+            Assertions.assertNotNull(addedType);
+            Assertions.assertEquals("Profile Type TST", addedType.getTypeDescription());
+            Assertions.assertEquals(3, addedType.getAttributeList().size());
 
             ResultActions result = mockMvc
                     .perform(get("/profileTypes/{profileTypeCode}", new Object[]{"TST"})
@@ -143,32 +148,107 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testAddUpdateUserProfileType_1() throws Exception {
+    void testGetMyUserProfileTypeOk() throws Exception {
+        String loggedUsername = "logged_user";
+        String loggedUserPassword = "0x24";
+        String testTypeCode = "TST";
         try {
-            Assert.assertNull(this.userProfileManager.getEntityPrototype("AAA"));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype(testTypeCode));
+            UserDetails adminUser = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24")
+                    .withAuthorization(Group.FREE_GROUP_NAME, "manageUserProfile", Permission.MANAGE_USER_PROFILES)
+                    .build();
+            String accessTokenAdmin = mockOAuthInterceptor(adminUser);
+            this.executeProfileTypePost("11_POST_type_valid.json", accessTokenAdmin, status().isOk());
+            Assertions.assertNotNull(this.userProfileManager.getEntityPrototype(testTypeCode));
+            Assertions.assertNull(userManager.getUser(loggedUsername));
+
+            final IUserProfile loggedUserProfile = userProfileManager.getProfileType(testTypeCode);
+
+            User newUser = new User();
+            newUser.setUsername(loggedUsername);
+            newUser.setPassword(loggedUserPassword);
+            newUser.setProfile(loggedUserProfile);
+            Assertions.assertNull(userManager.getUser(loggedUsername));
+            this.userManager.addUser(newUser);
+            Assertions.assertNotNull(userManager.getUser(loggedUsername));
+
+            UserDetails loggedUser = new OAuth2TestUtils.UserBuilder(loggedUsername, loggedUserPassword)
+                    .withAuthorization(Group.FREE_GROUP_NAME, "editor", Permission.BACKOFFICE)
+                    .withUserProfile(loggedUserProfile)
+                    .build();
+
+            String accessToken = mockOAuthInterceptor(loggedUser);
+
+            executeGetMyProfileType(loggedUser, accessToken, status().isOk())
+                    .andExpect(jsonPath("$.payload.code", is(testTypeCode)));;
+
+        } finally {
+            this.userProfileManager.deleteProfile(loggedUsername);
+            this.userManager.removeUser(loggedUsername);
+            if (null != this.userProfileManager.getEntityPrototype(testTypeCode)) {
+                ((IEntityTypesConfigurer) this.userProfileManager).removeEntityPrototype(testTypeCode);
+            }
+        }
+    }
+
+    @Test
+    void testGetMyUserProfileTypeInvalid() throws Exception {
+        String loggedUsername = "logged_user";
+        String loggedUserPassword = "0x24";
+            final IUserProfile invalidProfile = new UserProfile();
+            invalidProfile.setTypeCode("ABC");
+            UserDetails loggedUser = new OAuth2TestUtils.UserBuilder(loggedUsername, loggedUserPassword)
+                    .withAuthorization(Group.FREE_GROUP_NAME, "editor", Permission.BACKOFFICE)
+                    .withUserProfile(invalidProfile)
+                    .build();
+
+            String accessToken = mockOAuthInterceptor(loggedUser);
+
+            executeGetMyProfileType(loggedUser, accessToken, status().isNotFound());
+    }
+
+    @Test
+    void testGetMyUserProfileTypeNotFound() throws Exception {
+        String loggedUsername = "logged_user";
+        String loggedUserPassword = "0x24";
+
+        UserDetails loggedUser = new OAuth2TestUtils.UserBuilder(loggedUsername, loggedUserPassword)
+                .withAuthorization(Group.FREE_GROUP_NAME, "editor", Permission.BACKOFFICE)
+                .withUserProfile(null)
+                .build();
+
+        String accessToken = mockOAuthInterceptor(loggedUser);
+
+        executeGetMyProfileType(loggedUser, accessToken, status().isNotFound());
+    }
+
+    @Test
+    void testAddUpdateUserProfileType_1() throws Exception {
+        try {
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype("AAA"));
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
 
             this.executeProfileTypePost("1_POST_valid.json", accessToken, status().isOk());
 
             UserProfile addedType = (UserProfile) this.userProfileManager.getEntityPrototype("AAA");
-            Assert.assertNotNull(addedType);
-            Assert.assertEquals("Profile Type AAA", addedType.getTypeDescription());
-            Assert.assertEquals(1, addedType.getAttributeList().size());
+            Assertions.assertNotNull(addedType);
+            Assertions.assertEquals("Profile Type AAA", addedType.getTypeDescription());
+            Assertions.assertEquals(1, addedType.getAttributeList().size());
 
             this.executeProfileTypePut("1_PUT_invalid.json", "AAA", accessToken, status().isBadRequest());
 
             this.executeProfileTypePut("1_PUT_valid.json", "AAA", accessToken, status().isOk());
 
             addedType = (UserProfile) this.userProfileManager.getEntityPrototype("AAA");
-            Assert.assertEquals("Profile Type AAA Modified", addedType.getTypeDescription());
-            Assert.assertEquals(2, addedType.getAttributeList().size());
+            Assertions.assertEquals("Profile Type AAA Modified", addedType.getTypeDescription());
+            Assertions.assertEquals(2, addedType.getAttributeList().size());
 
             ResultActions result4 = mockMvc
                     .perform(delete("/profileTypes/{profileTypeCode}", new Object[]{"AAA"})
                             .header("Authorization", "Bearer " + accessToken));
             result4.andExpect(status().isOk());
-            Assert.assertNull(this.userProfileManager.getEntityPrototype("AAA"));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype("AAA"));
         } finally {
             if (null != this.userProfileManager.getEntityPrototype("AAA")) {
                 ((IEntityTypesConfigurer) this.userProfileManager).removeEntityPrototype("AAA");
@@ -177,26 +257,26 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testAddUpdateUserProfileType_2() throws Exception {
+    void testAddUpdateUserProfileType_2() throws Exception {
         try {
-            Assert.assertNull(this.userProfileManager.getEntityPrototype("TST"));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype("TST"));
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
 
             ResultActions result1 = this.executeProfileTypePost("2_POST_invalid_1.json", accessToken, status().isBadRequest());
             result1.andExpect(jsonPath("$.payload", Matchers.hasSize(0)));
             result1.andExpect(jsonPath("$.errors", Matchers.hasSize(1)));
-            Assert.assertNull(this.userProfileManager.getEntityPrototype("TST"));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype("TST"));
 
             ResultActions result2 = this.executeProfileTypePost("2_POST_invalid_2.json", accessToken, status().isBadRequest());
             result2.andExpect(jsonPath("$.payload", Matchers.hasSize(0)));
             result2.andExpect(jsonPath("$.errors", Matchers.hasSize(3)));
-            Assert.assertNull(this.userProfileManager.getEntityPrototype("TST"));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype("TST"));
 
             this.executeProfileTypePost("2_POST_valid.json", accessToken, status().isOk());
             UserProfile addedDataObject = (UserProfile) this.userProfileManager.getEntityPrototype("TST");
-            Assert.assertNotNull(addedDataObject);
-            Assert.assertEquals(3, addedDataObject.getAttributeList().size());
+            Assertions.assertNotNull(addedDataObject);
+            Assertions.assertEquals(3, addedDataObject.getAttributeList().size());
 
             this.executeProfileTypePost("2_POST_valid.json", accessToken, status().isConflict());
 
@@ -205,14 +285,14 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
             this.executeProfileTypePut("2_PUT_valid.json", "TST", accessToken, status().isOk());
 
             UserProfile modifiedDataObject = (UserProfile) this.userProfileManager.getEntityPrototype("TST");
-            Assert.assertNotNull(modifiedDataObject);
-            Assert.assertEquals(5, modifiedDataObject.getAttributeList().size());
+            Assertions.assertNotNull(modifiedDataObject);
+            Assertions.assertEquals(5, modifiedDataObject.getAttributeList().size());
 
             ResultActions result4 = mockMvc
                     .perform(delete("/profileTypes/{profileTypeCode}", new Object[]{"TST"})
                             .header("Authorization", "Bearer " + accessToken));
             result4.andExpect(status().isOk());
-            Assert.assertNull(this.userProfileManager.getEntityPrototype("TST"));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype("TST"));
         } finally {
             if (null != this.userProfileManager.getEntityPrototype("TST")) {
                 ((IEntityTypesConfigurer) this.userProfileManager).removeEntityPrototype("TST");
@@ -246,7 +326,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     
     // attributes
     @Test
-    public void testGetUserProfileAttributeTypes_1() throws Exception {
+    void testGetUserProfileAttributeTypes_1() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -257,7 +337,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testGetUserProfileAttributeTypes_2() throws Exception {
+    void testGetUserProfileAttributeTypes_2() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -273,7 +353,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testGetUserProfileAttributeTypes_3() throws Exception {
+    void testGetUserProfileAttributeTypes_3() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -290,7 +370,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
     
     @Test
-    public void testGetUserProfileAttributeType_1() throws Exception {
+    void testGetUserProfileAttributeType_1() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -300,14 +380,14 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
         result.andExpect(jsonPath("$.payload.code", is("Monotext")));
         result.andExpect(jsonPath("$.payload.multilingual", is(false)));
         result.andExpect(jsonPath("$.payload.dateFilterSupported", is(false)));
-        result.andExpect(jsonPath("$.payload.allowedRoles", Matchers.hasSize(4)));
+        result.andExpect(jsonPath("$.payload.allowedRoles", Matchers.hasSize(5)));
         result.andExpect(jsonPath("$.payload.simple", is(true)));
         result.andExpect(jsonPath("$.errors", Matchers.hasSize(0)));
         result.andExpect(jsonPath("$.metaData.size()", is(0)));
     }
 
     @Test
-    public void testGetUserProfileAttributeType_2() throws Exception {
+    void testGetUserProfileAttributeType_2() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -320,7 +400,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testGetUserProfileAttributeType_3() throws Exception {
+    void testGetUserProfileAttributeType_3() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -341,7 +421,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
         result.andExpect(jsonPath("$.payload.assignedRoles.size()", is(2)));
         result.andExpect(jsonPath("$.payload.assignedRoles.userprofile:fullname", is("fullname")));
         result.andExpect(jsonPath("$.payload.assignedRoles.userprofile:email", is("email")));
-        result.andExpect(jsonPath("$.payload.allowedRoles", Matchers.hasSize(4)));
+        result.andExpect(jsonPath("$.payload.allowedRoles", Matchers.hasSize(5)));
         result.andExpect(jsonPath("$.payload.dateFilterSupported", is(false)));
         result.andExpect(jsonPath("$.payload.simple", is(true)));
         result.andExpect(jsonPath("$.errors", Matchers.hasSize(0)));
@@ -350,9 +430,9 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     
     // ------------------------------------
     @Test
-    public void testGetUserProfileAttribute() throws Exception {
+    void testGetUserProfileAttribute() throws Exception {
         try {
-            Assert.assertNull(this.userProfileManager.getEntityPrototype("TST"));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype("TST"));
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
 
@@ -392,10 +472,10 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testAddUserProfileAttribute() throws Exception {
+    void testAddUserProfileAttribute() throws Exception {
         String typeCode = "TST";
         try {
-            Assert.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
 
@@ -432,7 +512,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
             result5.andExpect(jsonPath("$.metaData.profileTypeCode", is(typeCode)));
 
             IApsEntity profileType = this.userProfileManager.getEntityPrototype(typeCode);
-            Assert.assertEquals(4, profileType.getAttributeList().size());
+            Assertions.assertEquals(4, profileType.getAttributeList().size());
         } finally {
             if (null != this.userProfileManager.getEntityPrototype(typeCode)) {
                 ((IEntityTypesConfigurer) this.userProfileManager).removeEntityPrototype(typeCode);
@@ -441,16 +521,16 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testUpdateUserProfileAttribute() throws Exception {
+    void testUpdateUserProfileAttribute() throws Exception {
         String typeCode = "TST";
         try {
-            Assert.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
 
             this.executeProfileTypePost("2_POST_valid.json", accessToken, status().isOk());
             IApsEntity profileType = this.userProfileManager.getEntityPrototype(typeCode);
-            Assert.assertEquals(3, profileType.getAttributeList().size());
+            Assertions.assertEquals(3, profileType.getAttributeList().size());
 
             ResultActions result1 = this.executeProfileAttributePut("4_PUT_attribute_invalid_1.json", typeCode, "list_wrong", accessToken, status().isNotFound());
             result1.andExpect(jsonPath("$.payload", Matchers.hasSize(0)));
@@ -477,8 +557,8 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
             result4.andExpect(jsonPath("$.metaData.profileTypeCode", is(typeCode)));
 
             profileType = this.userProfileManager.getEntityPrototype(typeCode);
-            Assert.assertEquals(3, profileType.getAttributeList().size());
-            Assert.assertNotNull(profileType.getAttribute("list"));
+            Assertions.assertEquals(3, profileType.getAttributeList().size());
+            Assertions.assertNotNull(profileType.getAttribute("list"));
         } finally {
             if (null != this.userProfileManager.getEntityPrototype(typeCode)) {
                 ((IEntityTypesConfigurer) this.userProfileManager).removeEntityPrototype(typeCode);
@@ -487,17 +567,17 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testDeleteUserProfileAttribute() throws Exception {
+    void testDeleteUserProfileAttribute() throws Exception {
         String typeCode = "TST";
         try {
-            Assert.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
 
             this.executeProfileTypePost("2_POST_valid.json", accessToken, status().isOk());
             IApsEntity profileType = this.userProfileManager.getEntityPrototype(typeCode);
-            Assert.assertEquals(3, profileType.getAttributeList().size());
-            Assert.assertNotNull(profileType.getAttribute("list"));
+            Assertions.assertEquals(3, profileType.getAttributeList().size());
+            Assertions.assertNotNull(profileType.getAttribute("list"));
 
             ResultActions result1 = this.executeProfileAttributeDelete("wrongCode", "list_wrong", accessToken, status().isNotFound());
             result1.andExpect(jsonPath("$.payload", Matchers.hasSize(0)));
@@ -512,7 +592,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
             result2.andExpect(jsonPath("$.metaData.size()", is(0)));
 
             profileType = this.userProfileManager.getEntityPrototype(typeCode);
-            Assert.assertEquals(3, profileType.getAttributeList().size());
+            Assertions.assertEquals(3, profileType.getAttributeList().size());
 
             ResultActions result3 = this.executeProfileAttributeDelete(typeCode, "list", accessToken, status().isOk());
             result3.andExpect(jsonPath("$.payload.profileTypeCode", is(typeCode)));
@@ -521,8 +601,8 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
             result3.andExpect(jsonPath("$.metaData.size()", is(0)));
 
             profileType = this.userProfileManager.getEntityPrototype(typeCode);
-            Assert.assertEquals(2, profileType.getAttributeList().size());
-            Assert.assertNull(profileType.getAttribute("list"));
+            Assertions.assertEquals(2, profileType.getAttributeList().size());
+            Assertions.assertNull(profileType.getAttribute("list"));
         } finally {
             if (null != this.userProfileManager.getEntityPrototype(typeCode)) {
                 ((IEntityTypesConfigurer) this.userProfileManager).removeEntityPrototype(typeCode);
@@ -564,7 +644,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
     
     @Test
-    public void testGetUserProfileTypesStatus() throws Exception {
+    void testGetUserProfileTypesStatus() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -581,7 +661,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testRefreshUserProfileType_1() throws Exception {
+    void testRefreshUserProfileType_1() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -606,16 +686,16 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testRefreshUserProfileType_2() throws Exception {
+    void testRefreshUserProfileType_2() throws Exception {
         String typeCode = "TST";
         try {
-            Assert.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
-            Assert.assertNull(this.userProfileManager.getEntityPrototype("XXX"));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype("XXX"));
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
 
             this.executeProfileTypePost("2_POST_valid.json", accessToken, status().isOk());
-            Assert.assertNotNull(this.userProfileManager.getEntityPrototype(typeCode));
+            Assertions.assertNotNull(this.userProfileManager.getEntityPrototype(typeCode));
 
             ResultActions result1 = mockMvc
                     .perform(post("/profileTypes/refresh/{profileTypeCode}", new Object[]{typeCode})
@@ -645,17 +725,17 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
     
     @Test
-    public void testRefreshUserProfileType_3() throws Exception {
+    void testRefreshUserProfileType_3() throws Exception {
         String typeCode = "TST";
         try {
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
             
             this.checkStatus(3, 0, accessToken);
-            Assert.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
             
             this.executeProfileTypePost("2_POST_valid.json", accessToken, status().isOk());
-            Assert.assertNotNull(this.userProfileManager.getEntityPrototype(typeCode));
+            Assertions.assertNotNull(this.userProfileManager.getEntityPrototype(typeCode));
             this.checkStatus(4, 0, accessToken);
             
             ResultActions result = this.executeProfileAttributePut("10_PUT_attribute_valid_1.json", typeCode, "DataAttribute", accessToken, status().isOk());
@@ -710,9 +790,19 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
         result.andExpect(jsonPath("$.errors", Matchers.hasSize(0)));
         result.andExpect(jsonPath("$.metaData.size()", is(0)));
     }
-    
+
+    private ResultActions executeGetMyProfileType(UserDetails user, String accessToken, ResultMatcher expected) throws Exception {
+        ResultActions result = mockMvc
+                .perform(get("/myProfileType")
+                        .flashAttr("user", user)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .header("Authorization", "Bearer " + accessToken));
+        result.andDo(print()).andExpect(expected);
+        return result;
+    }
+
     @Test
-    public void testGetUserProfileTypesWithAdminPermission() throws Exception {
+    void testGetUserProfileTypesWithAdminPermission() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -722,7 +812,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testGetUserProfileTypesWithoutPermission() throws Exception {
+    void testGetUserProfileTypesWithoutPermission() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("normal_user", "0x24").build();
         String accessToken = mockOAuthInterceptor(user);
         ResultActions result = mockMvc
@@ -732,7 +822,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testGetUserProfileTypesWithEditUserProfilePermission() throws Exception {
+    void testGetUserProfileTypesWithEditUserProfilePermission() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("normal_user", "0x24")
                 .withAuthorization(Group.FREE_GROUP_NAME, "admin", Permission.MANAGE_USER_PROFILES).build();
         String accessToken = mockOAuthInterceptor(user);
@@ -743,7 +833,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testGetUserProfileTypesWithViewUsersProfilePermission() throws Exception {
+    void testGetUserProfileTypesWithViewUsersProfilePermission() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("normal_user", "0x24")
                 .withAuthorization(Group.FREE_GROUP_NAME, "admin", Permission.VIEW_USERS).build();
         String accessToken = mockOAuthInterceptor(user);
@@ -754,7 +844,7 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testGetUserProfileTypesWithEditUsersProfilePermission() throws Exception {
+    void testGetUserProfileTypesWithEditUsersProfilePermission() throws Exception {
         UserDetails user = new OAuth2TestUtils.UserBuilder("normal_user", "0x24")
                 .withAuthorization(Group.FREE_GROUP_NAME, "admin", Permission.MANAGE_USERS).build();
         String accessToken = mockOAuthInterceptor(user);
@@ -765,10 +855,10 @@ public class ProfileTypeControllerIntegrationTest extends AbstractControllerInte
     }
 
     @Test
-    public void testAddUpdateDeleteUserProfileAttributeWithRegex() throws Exception {
+    void testAddUpdateDeleteUserProfileAttributeWithRegex() throws Exception {
         String typeCode = "REX";
         try {
-            Assert.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
+            Assertions.assertNull(this.userProfileManager.getEntityPrototype(typeCode));
             UserDetails user = new OAuth2TestUtils.UserBuilder("jack_bauer", "0x24").grantedToRoleAdmin().build();
             String accessToken = mockOAuthInterceptor(user);
 

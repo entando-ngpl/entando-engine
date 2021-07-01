@@ -37,9 +37,9 @@ import com.agiletec.aps.util.ApsProperties;
  * @author E.Santoboni
  */
 public class ApiCatalogDAO extends AbstractDAO implements IApiCatalogDAO {
-	
+
 	private static final EntLogger _logger =  EntLogFactory.getSanitizedLogger(ApiCatalogDAO.class);
-	
+
 	@Override
     public void loadApiStatus(Map<String, ApiResource> resources) {
         Connection conn = null;
@@ -55,7 +55,7 @@ public class ApiCatalogDAO extends AbstractDAO implements IApiCatalogDAO {
             while (res.next()) {
                 String resourceCode = res.getString("resourcecode");
                 String httpMethodString = res.getString("httpmethod");
-                ApiMethod.HttpMethod httpMethod = Enum.valueOf(ApiMethod.HttpMethod.class, httpMethodString.toUpperCase());
+                HttpMethod httpMethod = Enum.valueOf(HttpMethod.class, httpMethodString.toUpperCase());
                 ApiMethod method = null;
                 ApiResource resource = resources.get(resourceCode);
                 if (null != resource) {
@@ -87,7 +87,7 @@ public class ApiCatalogDAO extends AbstractDAO implements IApiCatalogDAO {
             closeDaoResources(res, stat, conn);
         }
     }
-	
+
     @Override
     public void resetApiStatus(String resourceCode, HttpMethod httpMethod) {
         Connection conn = null;
@@ -104,7 +104,7 @@ public class ApiCatalogDAO extends AbstractDAO implements IApiCatalogDAO {
             closeConnection(conn);
         }
     }
-	
+
     protected void resetApiStatus(String resourceCode, HttpMethod httpMethod, Connection conn) {
         PreparedStatement stat = null;
         try {
@@ -119,7 +119,7 @@ public class ApiCatalogDAO extends AbstractDAO implements IApiCatalogDAO {
             closeDaoResources(null, stat);
         }
     }
-	
+
     @Override
     public void saveApiStatus(ApiMethod method) {
         Connection conn = null;
@@ -153,13 +153,13 @@ public class ApiCatalogDAO extends AbstractDAO implements IApiCatalogDAO {
             closeDaoResources(null, stat, conn);
         }
     }
-	
+
     @Deprecated
     @Override
     public Map<String, ApiService> loadServices(Map<String, ApiMethod> methods) {
         return this.loadServices(new ArrayList<ApiMethod>(methods.values()));
     }
-	
+
     @Override
     public Map<String, ApiService> loadServices(List<ApiMethod> methods) {
         Map<String, ApiMethod> methodMap = new HashMap<String, ApiMethod>();
@@ -188,7 +188,7 @@ public class ApiCatalogDAO extends AbstractDAO implements IApiCatalogDAO {
         }
         return services;
     }
-	
+
     private void buildService(Map<String, ApiMethod> methods,
             Map<String, ApiService> services, List<String> invalidServices, ResultSet res) {
         String key = null;
@@ -273,7 +273,7 @@ public class ApiCatalogDAO extends AbstractDAO implements IApiCatalogDAO {
             closeDaoResources(null, stat, conn);
         }
     }
-	
+
 	private int valorizeStatement(ApiService service, PreparedStatement stat, int index) throws Throwable {
 		String resourceCode = ApiResource.getCode(service.getMaster().getNamespace(), service.getMaster().getResourceName());
 		stat.setString(++index, resourceCode);
@@ -327,32 +327,32 @@ public class ApiCatalogDAO extends AbstractDAO implements IApiCatalogDAO {
             closeDaoResources(null, stat, conn);
         }
     }
-    
+
     private static final String LOAD_API_STATUS =
             "SELECT resourcecode, httpmethod, isactive, authenticationrequired, authorizationrequired, ishidden "
             + "FROM apicatalog_methods";
-    
+
     private static final String SAVE_API_STATUS =
             "INSERT INTO apicatalog_methods(resourcecode, httpmethod, isactive, "
             + "authenticationrequired, authorizationrequired, ishidden) VALUES (?, ?, ?, ?, ?, ?)";
-    
+
     private static final String RESET_API_STATUS =
             "DELETE FROM apicatalog_methods WHERE resourcecode = ? AND httpmethod = ?";
-    
+
     private static final String LOAD_SERVICES =
 			"SELECT servicekey, resourcecode, description, parameters, tag, freeparameters, isactive, "
 			+ "ishidden, myentando, authenticationrequired, requiredpermission, requiredgroup FROM apicatalog_services";
-    
+
     private static final String ADD_SERVICE =
             "INSERT INTO apicatalog_services(servicekey, resourcecode, description, parameters, tag, "
 			+ "freeparameters, isactive, ishidden, myentando, authenticationrequired, requiredpermission, requiredgroup) "
 			+ "VALUES ( ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? ) ";
-    
+
     private static final String UPDATE_SERVICE =
             "UPDATE apicatalog_services SET resourcecode = ? , description = ? , parameters = ? , tag = ? , "
 			+ "freeparameters = ? , isactive = ? , ishidden = ? , myentando = ? , authenticationrequired = ? , requiredpermission = ? , requiredgroup = ? WHERE servicekey = ? ";
-    
+
     private static final String DELETE_SERVICE =
             "DELETE FROM apicatalog_services WHERE servicekey = ? ";
-    
+
 }

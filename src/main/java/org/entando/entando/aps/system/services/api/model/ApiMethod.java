@@ -32,9 +32,9 @@ import org.entando.entando.ent.exception.EntException;
 public class ApiMethod implements Serializable {
 
 	private static final EntLogger _logger = EntLogFactory.getSanitizedLogger(ApiMethod.class);
-	
+
     protected ApiMethod() {}
-    
+
     public ApiMethod(Element element) {
         this.setResourceName(element.getAttributeValue(ApiResourcesDefDOM.RESOURCE_ATTRIBUTE_NAME));
 		this.setNamespace(element.getAttributeValue(ApiResourcesDefDOM.RESOURCE_ATTRIBUTE_NAMESPACE));
@@ -45,8 +45,8 @@ public class ApiMethod implements Serializable {
         }
         this.buildMethod(element);
     }
-    
-    public ApiMethod(String resourceName, String namespace, 
+
+    public ApiMethod(String resourceName, String namespace,
 			String source, String pluginCode, Element element) {
         this.setResourceName(resourceName);
 		this.setNamespace(namespace);
@@ -54,7 +54,7 @@ public class ApiMethod implements Serializable {
         this.setPluginCode(pluginCode);
         this.buildMethod(element);
     }
-    
+
 	private void buildMethod(Element element) {
 		try {
 			this.setDefaultRequiredAuth(Boolean.parseBoolean(element.getAttributeValue("requiredAuth")));
@@ -63,7 +63,7 @@ public class ApiMethod implements Serializable {
 			this.setRequiredPermission(this.getDefaultRequiredPermission());
 			String httpMethod = element.getAttributeValue("httpMethod");
 			if (null != httpMethod) {
-				this.setHttpMethod(Enum.valueOf(ApiMethod.HttpMethod.class, httpMethod.toUpperCase()));
+				this.setHttpMethod(Enum.valueOf(HttpMethod.class, httpMethod.toUpperCase()));
 			} else {
 				this.setHttpMethod(HttpMethod.GET);
 			}
@@ -107,7 +107,7 @@ public class ApiMethod implements Serializable {
 			throw new RuntimeException("Error building api method", t);
 		}
 	}
-    
+
 	@Override
     public ApiMethod clone() {
         ApiMethod clone = new ApiMethod();
@@ -151,42 +151,42 @@ public class ApiMethod implements Serializable {
         }
         return clone;
     }
-    
+
     public void resetConfiguration() {
         this.setRequiredAuth(this.getDefaultRequiredAuth());
         this.setRequiredPermission(this.getDefaultRequiredPermission());
         this.setStatus(this.getDefaultStatus());
 		this.setHidden(this.getDefaultHidden());
     }
-    
+
     public String getResourceName() {
         return _resourceName;
     }
     protected void setResourceName(String resourceName) {
         this._resourceName = resourceName;
     }
-    
+
     public HttpMethod getHttpMethod() {
         return _httpMethod;
     }
     protected void setHttpMethod(HttpMethod httpMethod) {
         this._httpMethod = httpMethod;
     }
-    
+
     public String getNamespace() {
         return _namespace;
     }
     protected void setNamespace(String namespace) {
         this._namespace = namespace;
     }
-    
+
     public Boolean getStatus() {
         return _status;
     }
     public void setStatus(Boolean status) {
         this._status = status;
     }
-	
+
     public Boolean getDefaultStatus() {
 		if (null == this._defaultStatus) return false;
         return _defaultStatus;
@@ -194,14 +194,14 @@ public class ApiMethod implements Serializable {
     protected void setDefaultStatus(Boolean defaultStatus) {
         this._defaultStatus = defaultStatus;
     }
-    
+
 	public Boolean getHidden() {
 		return _hidden;
 	}
 	public void setHidden(Boolean hidden) {
 		this._hidden = hidden;
 	}
-    
+
 	public Boolean getDefaultHidden() {
 		if (null == this._defaultHidden) return false;
 		return _defaultHidden;
@@ -209,14 +209,14 @@ public class ApiMethod implements Serializable {
 	public void setDefaultHidden(Boolean defaultHidden) {
 		this._defaultHidden = defaultHidden;
 	}
-    
+
     public Class getExpectedType() {
         return _expectedType;
     }
     protected void setExpectedType(Class expectedType) {
         this._expectedType = expectedType;
     }
-    
+
     public Boolean getDefaultRequiredAuth() {
         if (null == this._defaultRequiredAuth) return false;
         return _defaultRequiredAuth;
@@ -224,14 +224,14 @@ public class ApiMethod implements Serializable {
     protected void setDefaultRequiredAuth(Boolean defaultRequiredAuth) {
         this._defaultRequiredAuth = defaultRequiredAuth;
     }
-    
+
     public String getDefaultRequiredPermission() {
         return _defaultRequiredPermission;
     }
     protected void setDefaultRequiredPermission(String defaultRequiredPermission) {
         this._defaultRequiredPermission = defaultRequiredPermission;
     }
-    
+
     public Boolean getRequiredAuth() {
         if (null == this._requiredAuth) return false;
         return _requiredAuth;
@@ -239,14 +239,14 @@ public class ApiMethod implements Serializable {
     public void setRequiredAuth(Boolean requiredAuth) {
         this._requiredAuth = requiredAuth;
     }
-    
+
     public String getRequiredPermission() {
         return _requiredPermission;
     }
     public void setRequiredPermission(String requiredPermission) {
         this._requiredPermission = requiredPermission;
     }
-    
+
     public String getSource() {
         return _source;
     }
@@ -260,7 +260,7 @@ public class ApiMethod implements Serializable {
     public void setPluginCode(String pluginCode) {
         this._pluginCode = pluginCode;
     }
-    
+
     @Deprecated
     public String getMethodName() {
         return this.getResourceName();
@@ -276,7 +276,7 @@ public class ApiMethod implements Serializable {
     protected void setDescription(String description) {
         this._description = description;
     }
-    
+
     public boolean isActive() {
         if (null == this.getStatus()) return false;
         return this.getStatus();
@@ -329,7 +329,7 @@ public class ApiMethod implements Serializable {
         }
         return null;
     }
-	
+
 	@Deprecated
     public ApiMethodRelatedWidget getRelatedShowlet() {
         return this.getRelatedWidget();
@@ -338,44 +338,44 @@ public class ApiMethod implements Serializable {
     protected void setRelatedShowlet(ApiMethodRelatedWidget relatedShowlet) {
         this.setRelatedWidget(relatedShowlet);
     }
-	
+
 	public ApiMethodRelatedWidget getRelatedWidget() {
 		return _relatedWidget;
 	}
 	public void setRelatedWidget(ApiMethodRelatedWidget relatedWidget) {
 		this._relatedWidget = relatedWidget;
 	}
-    
+
     public static enum HttpMethod {
         GET,POST,PUT,DELETE
     }
-    
+
     private String _resourceName;
     private HttpMethod _httpMethod;
 	private String _namespace;
-    
+
     private Boolean _defaultStatus;
     private Boolean _status;
 	private Boolean _defaultHidden;
 	private Boolean _hidden;
-    
+
     private Boolean _defaultRequiredAuth;
     private String _defaultRequiredPermission;
     private Boolean _requiredAuth;
     private String _requiredPermission;
-    
+
     private Class _expectedType;
-    
+
     private String _source;
     private String _pluginCode;
-    
+
     private String _description;
-    
+
     private boolean _canSpawnOthers;
     private String _springBean;
     private String _springBeanMethod;
     private String _responseClassName;
     private List<ApiMethodParameter> _parameters;
     private ApiMethodRelatedWidget _relatedWidget;
-    
+
 }

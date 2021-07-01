@@ -12,17 +12,20 @@ INSERT INTO authroles (rolename, descr) VALUES ('admin', 'Tutte le funzioni');
 INSERT INTO authroles (rolename, descr) VALUES ('editor', 'Gestore di Contenuti e Risorse');
 INSERT INTO authroles (rolename, descr) VALUES ('supervisor', 'Supervisore di Contenuti');
 INSERT INTO authroles (rolename, descr) VALUES ('pageManager', 'Gestore di Pagine');
+INSERT INTO authroles (rolename, descr) VALUES ('reviewer', 'Recensore');
 
-
-
-
-INSERT INTO authpermissions (permissionname, descr) VALUES ('managePages', 'Operazioni su Pagine');
-INSERT INTO authpermissions (permissionname, descr) VALUES ('enterBackend', 'Accesso all''Area di Amministrazione');
-INSERT INTO authpermissions (permissionname, descr) VALUES ('manageResources', 'Operazioni su Risorse');
-INSERT INTO authpermissions (permissionname, descr) VALUES ('editContents', 'Redazione di Contenuti');
-INSERT INTO authpermissions (permissionname, descr) VALUES ('validateContents', 'Supervisione di Contenuti');
-INSERT INTO authpermissions (permissionname, descr) VALUES ('superuser', 'Tutte le funzioni');
-INSERT INTO authpermissions (permissionname, descr) VALUES ('manageCategories', 'Operazioni su Categorie');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('superuser', 'All functions');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('validateContents', 'Content Supervision');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('manageResources', 'Asset Editing');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('managePages', 'Operations on Pages');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('enterBackend', 'Access to Administration Area');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('manageCategories', 'Operations on Categories');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('editContents', 'Content Editing');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('viewUsers', 'View Users and Profiles');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('editUsers', 'User Management');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('editUserProfile', 'User Profile Editing');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('manageReview', 'Review Management');
+INSERT INTO authpermissions (permissionname, descr) VALUES ('enterECR', 'ECR Access Permission');
 
 
 
@@ -36,6 +39,8 @@ INSERT INTO authrolepermissions (rolename, permissionname) VALUES ('supervisor',
 INSERT INTO authrolepermissions (rolename, permissionname) VALUES ('editor', 'editContents');
 INSERT INTO authrolepermissions (rolename, permissionname) VALUES ('supervisor', 'validateContents');
 INSERT INTO authrolepermissions (rolename, permissionname) VALUES ('editor', 'manageResources');
+INSERT INTO authrolepermissions (rolename, permissionname) VALUES ('reviewer', 'enterBackend');
+INSERT INTO authrolepermissions (rolename, permissionname) VALUES ('reviewer', 'manageReview');
 
 
 

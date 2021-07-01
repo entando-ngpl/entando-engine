@@ -42,13 +42,13 @@ import com.agiletec.aps.util.DateConverter;
 public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializable {
 
 	private static final EntLogger _logger = EntLogFactory.getSanitizedLogger(EntitySearchFilter.class);
-	
+
 	protected EntitySearchFilter() {}
-    
+
     public EntitySearchFilter(Integer limit, Integer offset) {
         super(limit, offset);
     }
-	
+
 	/**
 	 * Filter constructor.
 	 * This constructor is used when checking the presence of a value contained
@@ -62,7 +62,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		super(key);
 		this.setAttributeFilter(isAttributeFilter);
 	}
-	
+
 	/**
 	 * Filter constructor.
 	 * This constructor must be used to filter the attribute values or entity metadata
@@ -84,23 +84,23 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 			allowedValues.addAll((Collection) value);
 			this.setAllowedValues(allowedValues);
 			if (allowedValues.get(0) instanceof String) {
-				this.setLikeOption(useLikeOption);			
+				this.setLikeOption(useLikeOption);
 			}
 		} else {
 			this.setValue(value);
-			if (value instanceof String) {			
+			if (value instanceof String) {
 				this.setLikeOption(useLikeOption);
 			}
 		}
 	}
-	
+
 	public EntitySearchFilter(String key, boolean isAttributeFilter, T value, boolean useLikeOption, LikeOptionType likeOptionType) {
 		this(key, isAttributeFilter, value, useLikeOption);
 		if (this.isLikeOption()) {
 			this.setLikeOptionType(likeOptionType);
 		}
 	}
-	
+
 	/**
 	 * Filter constructor.
 	 * This constructor is used when filtering by a range of values; this can applied to both
@@ -111,7 +111,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 	 * to a metadata (false).
 	 * @param start The starting value of the interval. It can be an object of type
 	 * "String", "Date", "BigDecimal", "Boolean" o null.
-	 * @param end The ending value of the interval. It can be an object of type 
+	 * @param end The ending value of the interval. It can be an object of type
 	 * "String", "Date", "BigDecimal", "Boolean" o null.
 	 */
 	public EntitySearchFilter(String key, boolean isAttributeFilter, T start, T end) {
@@ -122,7 +122,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		this.setStart(start);
 		this.setEnd(end);
 	}
-	
+
 	/**
 	 * Filter constructor.
 	 * This constructor is used when filtering by a collection of allowed values; this can applied to both
@@ -131,7 +131,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 	 * or the ID of metadata).
 	 * @param isAttributeFilter Decide whether the filter is applied to an Entity Attribute (true) or
 	 * to a metadata (false).
-	 * @param allowedValues The allowed values to look for. If null, the filter checks 
+	 * @param allowedValues The allowed values to look for. If null, the filter checks
 	 * if the attribute (or metadata) has been valued.
 	 * @param useLikeOption When true the database search will be performed using the "LIKE" clause.
 	 * This option can be used to filter by the value of a string attribute (or metadata). It can be
@@ -142,21 +142,21 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		this.setAllowedValues(allowedValues);
 		this.setLikeOption(useLikeOption);
 	}
-	
+
 	public EntitySearchFilter(String key, boolean isAttributeFilter, List<T> allowedValues, boolean useLikeOption, LikeOptionType likeOptionType) {
 		this(key, isAttributeFilter, allowedValues, useLikeOption);
 		if (this.isLikeOption()) {
 			this.setLikeOptionType(likeOptionType);
 		}
 	}
-	
+
 	public static EntitySearchFilter createRoleFilter(String roleName) {
 		EntitySearchFilter filter = new EntitySearchFilter();
 		filter.setAttributeFilter(true);
 		filter.setRoleName(roleName);
 		return filter;
 	}
-	
+
 	public static <T> EntitySearchFilter createRoleFilter(String roleName, T value, boolean useLikeOption) {
 		EntitySearchFilter filter = new EntitySearchFilter();
 		filter.setAttributeFilter(true);
@@ -166,17 +166,17 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 			allowedValues.addAll((Collection) value);
 			filter.setAllowedValues(allowedValues);
 			if (allowedValues.get(0) instanceof String) {
-				filter.setLikeOption(useLikeOption);			
+				filter.setLikeOption(useLikeOption);
 			}
 		} else {
 			filter.setValue(value);
-			if (value instanceof String) {			
+			if (value instanceof String) {
 				filter.setLikeOption(useLikeOption);
 			}
 		}
 		return filter;
 	}
-	
+
 	public static <T> EntitySearchFilter createRoleFilter(String roleName, T value, boolean useLikeOption, LikeOptionType likeOptionType) {
 		EntitySearchFilter filter = EntitySearchFilter.createRoleFilter(roleName, value, useLikeOption);
 		if (filter.isLikeOption()) {
@@ -184,7 +184,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return filter;
 	}
-	
+
 	public static <T> EntitySearchFilter createRoleFilter(String roleName, T start, T end) {
 		EntitySearchFilter filter = new EntitySearchFilter();
 		filter.setAttributeFilter(true);
@@ -196,7 +196,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		filter.setEnd(end);
 		return filter;
 	}
-	
+
 	public static <T> EntitySearchFilter createRoleFilter(String roleName, List<T> allowedValues, boolean useLikeOption) {
 		EntitySearchFilter filter = new EntitySearchFilter();
 		filter.setAttributeFilter(true);
@@ -205,7 +205,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		filter.setLikeOption(useLikeOption);
 		return filter;
 	}
-	
+
 	public static <T> EntitySearchFilter createRoleFilter(String roleName, List<T> allowedValues, boolean useLikeOption, LikeOptionType likeOptionType) {
 		EntitySearchFilter filter = EntitySearchFilter.createRoleFilter(roleName, allowedValues, useLikeOption);
 		if (filter.isLikeOption()) {
@@ -213,11 +213,11 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return filter;
 	}
-	
+
 	/**
 	 * This method shows if the filter must be applied on a Entity Attribute or
 	 * a metadata.
-	 * @return true if the filter is to be applied to an attribute entity or a 
+	 * @return true if the filter is to be applied to an attribute entity or a
 	 * to a metadata of the an entity.
 	 */
 	public boolean isAttributeFilter() {
@@ -226,18 +226,18 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 	protected void setAttributeFilter(boolean attributeFilter) {
 		this._attributeFilter = attributeFilter;
 	}
-	
+
 	public String getRoleName() {
 		return _roleName;
 	}
 	protected void setRoleName(String roleName) {
 		this._roleName = roleName;
 	}
-	
+
 	public String getLangCode() {
 		return this._langCode;
 	}
-	
+
 	public void setLangCode(String langCode) {
 		if (null == langCode) {
 			return;
@@ -245,15 +245,15 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		if (!this.isAttributeFilter()) {
 			throw new RuntimeException("Error: The language can be only specified on attribute filters");
 		}
-		if ((null != this.getValue() && !(this.getValue() instanceof String)) 
-				|| (null != this.getStart() &&  !(this.getStart() instanceof String)) 
-				|| (null != this.getEnd() &&  !(this.getEnd() instanceof String)) 
+		if ((null != this.getValue() && !(this.getValue() instanceof String))
+				|| (null != this.getStart() &&  !(this.getStart() instanceof String))
+				|| (null != this.getEnd() &&  !(this.getEnd() instanceof String))
 				|| (this.getAllowedValues() != null && !this.getAllowedValues().isEmpty() && !(this.getAllowedValues().get(0) instanceof String))) {
 			throw new RuntimeException("Error: The language can be only specified on a null value of type string");
 		}
 		this._langCode = langCode;
 	}
-	
+
 	@Override
 	public void setNullOption(boolean nullOption) {
 		if (null == this.getKey() && null != this.getRoleName()) {
@@ -261,7 +261,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		super.setNullOption(nullOption);
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuffer param = new StringBuffer();
@@ -295,7 +295,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return param.toString();
 	}
-	
+
 	private void appendParamValue(StringBuffer param, Object value, String paramValue) {
 		if (null != value) {
 			param.append(SEPARATOR).append(paramValue).append("=");
@@ -312,7 +312,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 			}
 		}
 	}
-	
+
 	private String getToStringValue(Object value) {
 		if (value instanceof String) {
 			return value.toString();
@@ -325,12 +325,12 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return value.toString();
 	}
-	
+
 	@Deprecated
 	public static EntitySearchFilter getInstance(IApsEntity prototype, String toStringFilter) {
 		return getInstance(prototype, getProperties(toStringFilter));
 	}
-	
+
 	@Deprecated
 	public static Properties getProperties(String toStringFilter) {
 		Properties props = new Properties();
@@ -344,7 +344,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return props;
 	}
-	
+
 	public static EntitySearchFilter getInstance(IApsEntity prototype, Properties props) {
 		EntitySearchFilter filter = null;
 		try {
@@ -390,10 +390,10 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 			if (isDateAttribute) {
 				String valueDateDelay = props.getProperty(EntitySearchFilter.VALUE_DATE_DELAY_PARAM);
 				filter.setValueDateDelay(null != valueDateDelay ? Integer.valueOf(valueDateDelay) : null);
-				
+
 				String endDateDelay = props.getProperty(EntitySearchFilter.END_DATE_DELAY_PARAM);
 				filter.setEndDateDelay(null != endDateDelay ? Integer.valueOf(endDateDelay) : null);
-				
+
 				String startDateDelay = props.getProperty(EntitySearchFilter.START_DATE_DELAY_PARAM);
 				filter.setStartDateDelay(null != startDateDelay ? Integer.valueOf(startDateDelay) : null);
 			}
@@ -405,7 +405,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return filter;
 	}
-	
+
 	private static void setValues(EntitySearchFilter filter, Properties props, String dataType) {
 		if (null == dataType) {
 			return;
@@ -452,7 +452,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		String langCode = props.getProperty(LANG_PARAM);
 		filter.setLangCode(langCode);
 	}
-	
+
 	private static List<Object> buildAllowedValues(String allowedValues, String dataType) {
 		if (null == allowedValues) {
 			return null;
@@ -474,7 +474,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return values;
 	}
-	
+
 	private static Object getDataObject(String stringValue, String dataType) {
 		if (null == stringValue) {
 			return null;
@@ -489,13 +489,13 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return object;
 	}
-	
+
 	private static Date buildDate(String dateString) {
 		String today = "today, oggi, odierna";
 		Date data = null;
 		try {
 			if (today.contains(dateString)) {
-				data = new java.util.Date();
+				data = new Date();
 			} else {
 				SimpleDateFormat dataF = new SimpleDateFormat(EntitySearchFilter.DATE_PATTERN);
 				data = dataF.parse(dateString);
@@ -505,7 +505,7 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return data;
 	}
-	
+
 	private static BigDecimal buildNumber(String numberString) {
 		BigDecimal number = null;
 		try {
@@ -515,12 +515,12 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 		}
 		return number;
 	}
-	
+
 	private boolean _attributeFilter;
-	
+
 	private String _langCode;
 	private String _roleName;
-	
+
 	public static final String SEPARATOR = ";";
 	public static final String KEY_PARAM = "key";
 	public static final String ROLE_PARAM = "role";
@@ -536,15 +536,15 @@ public class EntitySearchFilter<T> extends FieldSearchFilter implements Serializ
 	public static final String ORDER_PARAM = "order";
 	public static final String DATA_TYPE_PARAM = "dataType";
     public static final String NULL_VALUE_PARAM = "nullValue";
-	
+
 	public static final String DATA_TYPE_STRING = "string";
 	public static final String DATA_TYPE_DATE = "date";
 	public static final String DATA_TYPE_NUMBER = "number";
-	
+
 	public static final String DATE_PATTERN = "dd/MM/yyyy";
-	
+
 	public static final String START_DATE_DELAY_PARAM = "startDateDelay";
 	public static final String END_DATE_DELAY_PARAM = "endDateDelay";
 	public static final String VALUE_DATE_DELAY_PARAM = "valueDateDelay";
-	
+
 }

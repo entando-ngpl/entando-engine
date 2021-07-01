@@ -195,7 +195,7 @@ public class CompositeAttribute extends AbstractComplexAttribute {
      * indexable. Declaring indexable a complex attribute will make the contained element indexable.
      *
      * @return the indexing type
-     * @see com.agiletec.aps.system.common.entity.model.attribute.AttributeInterface#getIndexingType()
+     * @see AttributeInterface#getIndexingType()
      */
     @Override
     public String getIndexingType() {

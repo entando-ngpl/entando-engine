@@ -27,13 +27,21 @@ public class UserPreferencesDAO extends AbstractDAO implements IUserPreferencesD
 	private static final EntLogger _logger =  EntLogFactory.getSanitizedLogger(UserPreferencesDAO.class);
 
 	private static final String LOAD_USER_PREFERENCES =
-			"SELECT wizard, loadonpageselect, translationwarning FROM userpreferences WHERE username = ? ";
+			"SELECT wizard, loadonpageselect, translationwarning, defaultpageownergroup, defaultpagejoingroups, "
+					+ "defaultcontentownergroup, defaultcontentjoingroups, defaultwidgetownergroup, "
+					+ "defaultwidgetjoingroups FROM userpreferences WHERE username = ? ";
 
 	private static final String ADD_USER_PREFERENCES =
-			"INSERT INTO userpreferences (username, wizard, loadonpageselect, translationwarning) VALUES ( ? , ? , ? , ? )";
+			"INSERT INTO userpreferences (username, wizard, loadonpageselect, translationwarning, "
+					+ "defaultpageownergroup, defaultpagejoingroups, defaultcontentownergroup, "
+					+ "defaultcontentjoingroups, defaultwidgetownergroup, defaultwidgetjoingroups) VALUES ( ? , ? ,"
+					+ " ? , ? , ? , ?, ?, ?, ?, ? )";
 
 	private static final String UPDATE_USER_PREFERENCES =
-			"UPDATE userpreferences SET wizard = ? , loadonpageselect = ? , translationwarning = ? WHERE username = ? ";
+			"UPDATE userpreferences SET wizard = ? , loadonpageselect = ? , translationwarning = ? , "
+					+ "defaultpageownergroup = ? , defaultpagejoingroups = ? , defaultcontentownergroup = ? , "
+					+ "defaultcontentjoingroups = ? , defaultwidgetownergroup = ?, defaultwidgetjoingroups = ? WHERE "
+					+ "username = ? ";
 
 	private static final String DELETE_USER_PREFERENCES =
 			"DELETE FROM userpreferences WHERE username = ? ";
@@ -55,6 +63,12 @@ public class UserPreferencesDAO extends AbstractDAO implements IUserPreferencesD
 				response.setWizard(1 == res.getInt(1));
 				response.setLoadOnPageSelect(1 == res.getInt(2));
 				response.setTranslationWarning(1 == res.getInt(3));
+				response.setDefaultPageOwnerGroup(res.getString(4));
+				response.setDefaultPageJoinGroups(res.getString(5));
+				response.setDefaultContentOwnerGroup(res.getString(6));
+				response.setDefaultContentJoinGroups(res.getString(7));
+				response.setDefaultWidgetOwnerGroup(res.getString(8));
+				response.setDefaultWidgetJoinGroups(res.getString(9));
 			}
 		} catch (SQLException e) {
 			_logger.error("Error loading user preferences for user {}", username,  e);
@@ -77,6 +91,12 @@ public class UserPreferencesDAO extends AbstractDAO implements IUserPreferencesD
 			stat.setInt(2, userPreferences.isWizard() ? 1 : 0);
 			stat.setInt(3, userPreferences.isLoadOnPageSelect() ? 1 : 0);
 			stat.setInt(4, userPreferences.isTranslationWarning() ? 1 : 0);
+			stat.setString(5, userPreferences.getDefaultPageOwnerGroup());
+			stat.setString(6, userPreferences.getDefaultPageJoinGroups());
+			stat.setString(7, userPreferences.getDefaultContentOwnerGroup());
+			stat.setString(8, userPreferences.getDefaultContentJoinGroups());
+			stat.setString(9, userPreferences.getDefaultWidgetOwnerGroup());
+			stat.setString(10, userPreferences.getDefaultWidgetJoinGroups());
 			stat.executeUpdate();
 			conn.commit();
 		} catch (SQLException e) {
@@ -99,13 +119,18 @@ public class UserPreferencesDAO extends AbstractDAO implements IUserPreferencesD
 			stat.setInt(1, userPreferences.isWizard() ? 1 : 0);
 			stat.setInt(2, userPreferences.isLoadOnPageSelect() ? 1 : 0);
 			stat.setInt(3, userPreferences.isTranslationWarning() ? 1 : 0);
-			stat.setString(4, userPreferences.getUsername());
+			stat.setString(4, userPreferences.getDefaultPageOwnerGroup());
+			stat.setString(5, userPreferences.getDefaultPageJoinGroups());
+			stat.setString(6, userPreferences.getDefaultContentOwnerGroup());
+			stat.setString(7, userPreferences.getDefaultContentJoinGroups());
+			stat.setString(8, userPreferences.getDefaultWidgetOwnerGroup());
+			stat.setString(9, userPreferences.getDefaultWidgetJoinGroups());
+			stat.setString(10, userPreferences.getUsername());
 			stat.executeUpdate();
 			conn.commit();
 		} catch (SQLException e) {
 			this.executeRollback(conn);
-			_logger.error("Error detected while updating user preferences",  userPreferences, e);
-			throw new EntException("Error detected while updating user preferences", e);
+			throw new EntException("Error detected while updating user preferences " + userPreferences, e);
 		} finally {
 			closeDaoResources(null, stat, conn);
 		}

@@ -26,6 +26,7 @@ public class UserPreferencesService implements IUserPreferencesService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static final String ERRCODE_USER_PREFERENCES_DOES_NOT_EXISTS = "1";
+    public static final String DEFAULT_JOIN_GROUP_DELIMITER = ";";
 
     IUserPreferencesManager userPreferencesManager;
 
@@ -58,6 +59,39 @@ public class UserPreferencesService implements IUserPreferencesService {
                 if (request.getTranslationWarning() != null) {
                     userPreferences.setTranslationWarning(request.getTranslationWarning());
                 }
+                if (request.getDefaultPageOwnerGroup() != null) {
+                    userPreferences.setDefaultPageOwnerGroup(request.getDefaultPageOwnerGroup());
+                }
+                if (request.getDefaultPageJoinGroups() != null) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String group : request.getDefaultPageJoinGroups()) {
+                        sb.append(group);
+                        sb.append(DEFAULT_JOIN_GROUP_DELIMITER);
+                    }
+                    userPreferences.setDefaultPageJoinGroups(sb.toString());
+                }
+                if (request.getDefaultContentOwnerGroup() != null) {
+                    userPreferences.setDefaultContentOwnerGroup(request.getDefaultContentOwnerGroup());
+                }
+                if (request.getDefaultContentJoinGroups() != null) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String group : request.getDefaultContentJoinGroups()) {
+                        sb.append(group);
+                        sb.append(DEFAULT_JOIN_GROUP_DELIMITER);
+                    }
+                    userPreferences.setDefaultContentJoinGroups(sb.toString());
+                }
+                if (request.getDefaultWidgetOwnerGroup() != null) {
+                    userPreferences.setDefaultWidgetOwnerGroup(request.getDefaultWidgetOwnerGroup());
+                }
+                if (request.getDefaultWidgetJoinGroups() != null) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String group : request.getDefaultWidgetJoinGroups()) {
+                        sb.append(group);
+                        sb.append(DEFAULT_JOIN_GROUP_DELIMITER);
+                    }
+                    userPreferences.setDefaultWidgetJoinGroups(sb.toString());
+                }
                 userPreferencesManager.updateUserPreferences(userPreferences);
                 return new UserPreferencesDto(userPreferencesManager.getUserPreferences(username));
             } else {
@@ -75,8 +109,8 @@ public class UserPreferencesService implements IUserPreferencesService {
             UserPreferences userPreferences = new UserPreferences();
             userPreferences.setUsername(username);
             userPreferences.setWizard(true);
-            userPreferences.setLoadOnPageSelect(true);
             userPreferences.setTranslationWarning(true);
+            userPreferences.setLoadOnPageSelect(true);
             userPreferencesManager.addUserPreferences(userPreferences);
         } catch (EntException e) {
             logger.error("Error in creating new default userPreferences for {}", username, e);
