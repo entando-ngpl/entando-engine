@@ -50,6 +50,7 @@ jobs:
       GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
       GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      ENTANDO_OPT_LOG_LEVEL: TRACE
     runs-on: ubuntu-latest
     steps:
       - name: "SONAR GATE CHECK"
