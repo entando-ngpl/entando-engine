@@ -13,9 +13,9 @@
  */
 package org.entando.entando.web.userprofile;
 
-import org.entando.entando.ent.exception.EntException;
 import com.agiletec.aps.system.services.role.Permission;
 import com.agiletec.aps.system.services.user.IUserManager;
+import com.agiletec.aps.system.services.user.UserDetails;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.entando.entando.aps.system.exception.ResourceNotFoundException;
 import org.entando.entando.aps.system.exception.RestServerError;
@@ -23,12 +23,14 @@ import org.entando.entando.aps.system.services.entity.model.EntityDto;
 import org.entando.entando.aps.system.services.userprofile.IUserProfileManager;
 import org.entando.entando.aps.system.services.userprofile.IUserProfileService;
 import org.entando.entando.aps.system.services.userprofile.model.IUserProfile;
+import org.entando.entando.ent.exception.EntException;
+import org.entando.entando.ent.util.EntLogging.EntLogFactory;
+import org.entando.entando.ent.util.EntLogging.EntLogger;
 import org.entando.entando.web.common.annotation.RestAccessControl;
 import org.entando.entando.web.common.exceptions.ValidationGenericException;
+import org.entando.entando.web.common.model.SimpleRestResponse;
 import org.entando.entando.web.entity.validator.EntityValidator;
 import org.entando.entando.web.userprofile.validator.ProfileValidator;
-import org.entando.entando.ent.util.EntLogging.EntLogger;
-import org.entando.entando.ent.util.EntLogging.EntLogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,12 +39,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import org.entando.entando.web.common.model.SimpleRestResponse;
 
 /**
  * @author E.Santoboni
  */
 @RestController
+@SessionAttributes("user")
 public class ProfileController {
 
     private final EntLogger logger = EntLogFactory.getSanitizedLogger(this.getClass());
@@ -75,10 +77,24 @@ public class ProfileController {
         this.profileValidator = profileValidator;
     }
 
-    @RestAccessControl(permission = Permission.MANAGE_USER_PROFILES)
+    @RestAccessControl(permission = {Permission.MANAGE_USER_PROFILES, Permission.MANAGE_USERS})
     @RequestMapping(value = "/userProfiles/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SimpleRestResponse<EntityDto>> getUserProfile(@PathVariable String username) throws JsonProcessingException {
         logger.debug("Requested profile -> {}", username);
+        final EntityDto dto = getUserProfileEntityDto(username);
+        logger.debug("Main Response -> {}", dto);
+        return new ResponseEntity<>(new SimpleRestResponse<>(dto), HttpStatus.OK);
+    }
+
+    @RestAccessControl(permission = Permission.BACKOFFICE)
+    @GetMapping(value = "/myUserProfile", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SimpleRestResponse<EntityDto>> getMyUserProfile(@ModelAttribute("user") UserDetails user) {
+        final EntityDto userProfileEntityDto = getUserProfileEntityDto(user.getUsername());
+        logger.debug("Main Response -> {}", userProfileEntityDto);
+        return new ResponseEntity<>(new SimpleRestResponse<>(userProfileEntityDto), HttpStatus.OK);
+    }
+
+    private EntityDto getUserProfileEntityDto(final String username) {
         EntityDto dto;
         if (!this.getProfileValidator().existProfile(username)) {
             if (userExists(username)) {
@@ -91,8 +107,7 @@ public class ProfileController {
         } else {
             dto = this.getUserProfileService().getUserProfile(username);
         }
-        logger.debug("Main Response -> {}", dto);
-        return new ResponseEntity<>(new SimpleRestResponse<>(dto), HttpStatus.OK);
+        return dto;
     }
 
     private boolean userExists(String username) {
@@ -133,7 +148,7 @@ public class ProfileController {
         return new ResponseEntity<>(new SimpleRestResponse<>(response), HttpStatus.OK);
     }
 
-    @RestAccessControl(permission = Permission.MANAGE_USER_PROFILES)
+    @RestAccessControl(permission = {Permission.MANAGE_USER_PROFILES, Permission.MANAGE_USERS})
     @RequestMapping(value = "/userProfiles/{username}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SimpleRestResponse<EntityDto>> updateUserProfile(@PathVariable String username,
             @Valid @RequestBody EntityDto bodyRequest, BindingResult bindingResult) {
@@ -142,6 +157,22 @@ public class ProfileController {
             throw new ValidationGenericException(bindingResult);
         }
         this.getProfileValidator().validateBodyName(username, bodyRequest, bindingResult);
+        EntityDto response = this.getUserProfileService().updateUserProfile(bodyRequest, bindingResult);
+        if (bindingResult.hasErrors()) {
+            throw new ValidationGenericException(bindingResult);
+        }
+        return new ResponseEntity<>(new SimpleRestResponse<>(response), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/myUserProfile", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RestAccessControl(permission = Permission.BACKOFFICE)
+    public ResponseEntity<SimpleRestResponse<EntityDto>> updateMyUserProfile(@ModelAttribute("user") UserDetails user,
+                                                                         @Valid @RequestBody EntityDto bodyRequest, BindingResult bindingResult) {
+        logger.debug("Update profile for the logged user {} -> {}", user.getUsername(), bodyRequest);
+        this.getProfileValidator().validateBodyName(user.getUsername(), bodyRequest, bindingResult);
+        if (bindingResult.hasErrors()) {
+            throw new ValidationGenericException(bindingResult);
+        }
         EntityDto response = this.getUserProfileService().updateUserProfile(bodyRequest, bindingResult);
         if (bindingResult.hasErrors()) {
             throw new ValidationGenericException(bindingResult);

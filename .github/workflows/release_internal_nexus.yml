@@ -3,20 +3,28 @@ name: Release on internal Nexus
 on:
   push:
     branches:
-      - master
+      - develop-xxx
 
 jobs:
-  release:
+  release-nexus:
+    env:
+      PPL_CONTEXT: ${{ toJson(github) }}
+      GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
+      GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
+      REPO_FOLDER: "repo_folder"
+      ENTANDO_OPT_LOG_LEVEL: DEBUG
     runs-on: ubuntu-latest
     steps:
-      - name: "Dump GitHub context"
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+      - name: "PR PIPELINE START"
+        run: |
+          source <(curl -qsL "https://raw.githubusercontent.com/entando/entando-pipelines/engine-exp/macro/install.sh")
+          ~/ppl-run \
+            pr-status-report
       - name: "Checkout"
-        uses: actions/checkout@v2
+        run: |
+          ~/ppl-run checkout-pr-branch "$REPO_FOLDER"
       - name: "Cache Maven packages"
-        uses: actions/cache@v2
+        uses: actions/cache@v2sour
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -25,12 +33,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-          server-id: ng-pipelines
+          server-id: internal-nexus
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
       - name: "Publish package"
         run: |
-          mvn --batch-mode deploy -DskipTests=true -DuseInternalRepo=true
+          ~/ppl-run mvn NEXUS-DEPLOY
         env:
           MAVEN_USERNAME: ${{ secrets.NEXUS_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}

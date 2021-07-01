@@ -19,8 +19,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "userPreferences")
-@XmlType(propOrder = {"username", "wizard", "loadOnPageSelect", "translationWarning"})
+@XmlType(propOrder = {"username", "wizard", "loadOnPageSelect", "translationWarning", "defaultPageOwnerGroup",
+		"defaultPageJoinGroups", "defaultContentOwnerGroup", "defaultContentJoinGroups", "defaultWidgetOwnerGroup",
+		"defaultWidgetJoinGroups"})
 public class UserPreferences implements Serializable {
+
+	private String username;
+	private boolean wizard;
+	private boolean loadOnPageSelect;
+	private boolean translationWarning;
+	private String defaultPageOwnerGroup;
+	private String defaultPageJoinGroups;
+	private String defaultContentOwnerGroup;
+	private String defaultContentJoinGroups;
+	private String defaultWidgetOwnerGroup;
+	private String defaultWidgetJoinGroups;
 
 	@XmlElement(name = "username", required = true)
 	public String getUsername() {
@@ -58,10 +71,59 @@ public class UserPreferences implements Serializable {
 		this.translationWarning = translationWarning;
 	}
 
-	private String username;
-	private boolean wizard;
-	private boolean loadOnPageSelect;
-	private boolean translationWarning;
+	@XmlElement(name = "defaultPageOwnerGroup")
+	public String getDefaultPageOwnerGroup() {
+		return defaultPageOwnerGroup;
+	}
+
+	public void setDefaultPageOwnerGroup(String defaultPageOwnerGroup) {
+		this.defaultPageOwnerGroup = defaultPageOwnerGroup;
+	}
+
+	@XmlElement(name = "defaultPageJoinGroups")
+	public String getDefaultPageJoinGroups() {
+		return defaultPageJoinGroups;
+	}
+
+	public void setDefaultPageJoinGroups(String defaultPageJoinGroups) {
+		this.defaultPageJoinGroups = defaultPageJoinGroups;
+	}
+
+	@XmlElement(name = "defaultContentOwnerGroup")
+	public String getDefaultContentOwnerGroup() {
+		return defaultContentOwnerGroup;
+	}
+
+	public void setDefaultContentOwnerGroup(String defaultContentOwnerGroup) {
+		this.defaultContentOwnerGroup = defaultContentOwnerGroup;
+	}
+
+	@XmlElement(name = "defaultContentJoinGroups")
+	public String getDefaultContentJoinGroups() {
+		return defaultContentJoinGroups;
+	}
+
+	public void setDefaultContentJoinGroups(String defaultContentJoinGroups) {
+		this.defaultContentJoinGroups = defaultContentJoinGroups;
+	}
+
+	@XmlElement(name = "defaultWidgetOwnerGroup")
+	public String getDefaultWidgetOwnerGroup() {
+		return defaultWidgetOwnerGroup;
+	}
+
+	public void setDefaultWidgetOwnerGroup(String defaultWidgetOwnerGroup) {
+		this.defaultWidgetOwnerGroup = defaultWidgetOwnerGroup;
+	}
+
+	@XmlElement(name = "defaultWidgetJoinGroups")
+	public String getDefaultWidgetJoinGroups() {
+		return defaultWidgetJoinGroups;
+	}
+
+	public void setDefaultWidgetJoinGroups(String defaultWidgetJoinGroups) {
+		this.defaultWidgetJoinGroups = defaultWidgetJoinGroups;
+	}
 
 	@Override
 	public String toString() {
@@ -70,6 +132,12 @@ public class UserPreferences implements Serializable {
 				", wizard=" + wizard +
 				", loadOnPageSelect=" + loadOnPageSelect +
 				", translationWarning=" + translationWarning +
+				", defaultPageOwnerGroup='" + defaultPageOwnerGroup + '\'' +
+				", defaultPageJoinGroups='" + defaultPageJoinGroups + '\'' +
+				", defaultContentOwnerGroup='" + defaultContentOwnerGroup + '\'' +
+				", defaultContentJoinGroups='" + defaultContentJoinGroups + '\'' +
+				", defaultWidgetOwnerGroup='" + defaultWidgetOwnerGroup + '\'' +
+				", defaultWidgetJoinGroups='" + defaultWidgetJoinGroups + '\'' +
 				'}';
 	}
 }

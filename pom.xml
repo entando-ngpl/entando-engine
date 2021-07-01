@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.entando</groupId>
         <artifactId>entando-core-parent</artifactId>
-        <version>6.2.22</version>
+        <version>6.3.16</version>
     </parent>
     <groupId>org.entando.entando</groupId>
     <artifactId>entando-engine-ngpl</artifactId>
     <packaging>jar</packaging>
-    <version>9.9.0</version>
+    <version>1.7.2</version>
     <name>Entando Core: Engine</name>
     <description>Entando Engine: an agile, modern and user-centric open source Portal platform.</description>
     <url>http://www.entando.com/</url>
@@ -40,10 +40,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <checkstyle.skip>true</checkstyle.skip>
-        <!-- SONAR -->
-        <sonar.projectKey>entando-ngpl_entando-engine</sonar.projectKey>
-        <sonar.organization>entando-ngpl</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
@@ -209,6 +205,22 @@
         </plugins>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <argLine>${argLine}</argLine>
+                        <forkCount>1</forkCount>
+                        <shutdown>exit</shutdown>
+                        <parallel>methods</parallel>
+                        <threadCount>8</threadCount>
+                        <excludes>
+                            <exclude>**/*BaseTestCase*</exclude>
+                            <exclude>**/Abstract*</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings
                 only. It has no influence on the Maven build itself. -->
                 <plugin>
@@ -277,6 +289,25 @@
         </pluginManagement>
     </build>
     <dependencies>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-json-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-jackson</artifactId>
+        </dependency>
+
         <!-- OWASP -->
         <dependency>
             <groupId>org.owasp.encoder</groupId>
@@ -286,27 +317,6 @@
         <dependency>
             <groupId>org.apache.struts</groupId>
             <artifactId>struts2-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j-core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j-core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j-core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j-core.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -326,7 +336,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
+            <artifactId>velocity-engine-core</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-digester</groupId>
@@ -434,8 +444,17 @@
             <artifactId>spring-data-rest-webmvc</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -455,12 +474,16 @@
         </dependency>
         <!--test dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
+            <artifactId>mockito-junit-jupiter</artifactId>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
@@ -473,11 +496,15 @@
     </dependencies>
 
 <!--    <distributionManagement>-->
-<!--        <repository>-->
-<!--            <id>ng-pipelines</id>-->
-<!--            <name>Entando Nexus</name>-->
-<!--            <url>https://nexus-jx.apps.serv.run/repository/ngpl-maven-releases/</url>-->
-<!--        </repository>-->
+<!--                <repository>-->
+<!--                    <id>ng-pipelines</id>-->
+<!--                    <name>Entando Nexus</name>-->
+<!--                    <url>https://nexus-jx.apps.serv.run/repository/ngpl-maven-releases/</url>-->
+<!--                </repository>-->
+<!--&lt;!&ndash;        <repository>&ndash;&gt;-->
+<!--&lt;!&ndash;            <id>oss.sonatype.org</id>&ndash;&gt;-->
+<!--&lt;!&ndash;            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>&ndash;&gt;-->
+<!--&lt;!&ndash;        </repository>&ndash;&gt;-->
 <!--    </distributionManagement>-->
 
     <scm>
@@ -504,9 +531,9 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <!--                            <suppressionFiles>-->
-                            <!--                                <suppressionFile>owasp-project-suppressions.xml</suppressionFile>-->
-                            <!--                            </suppressionFiles>-->
+<!--                            <suppressionFiles>-->
+<!--                                <suppressionFile>owasp-project-suppressions.xml</suppressionFile>-->
+<!--                            </suppressionFiles>-->
                             <failOnError>true</failOnError>
                             <failBuildOnAnyVulnerability>${verifyAllFailures}</failBuildOnAnyVulnerability>
                             <name>National Vulnerability Database Report</name>
@@ -519,43 +546,5 @@
                 </plugins>
             </build>
         </profile>
-
-        <profile>
-            <id>nexus-internal-repository</id>
-            <activation>
-                <property>
-                    <name>useInternalRepo</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <properties>
-            </properties>
-            <distributionManagement>
-                <repository>
-                    <id>ng-pipelines</id>
-                    <name>Entando Nexus</name>
-                    <url>https://nexus-jx.apps.serv.run/repository/ngpl-maven-releases/</url>
-                </repository>
-            </distributionManagement>
-        </profile>
-
-        <profile>
-            <id>maven-central-repository</id>
-            <activation>
-                <property>
-                    <name>useInternalRepo</name>
-                    <value>false</value>
-                </property>
-            </activation>
-            <properties>
-            </properties>
-            <distributionManagement>
-                <repository>
-                    <id>oss.sonatype.org</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
-        </profile>
     </profiles>
-
 </project>

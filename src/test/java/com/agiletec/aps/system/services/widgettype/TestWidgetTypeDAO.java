@@ -19,16 +19,20 @@ import com.agiletec.aps.system.services.lang.ILangManager;
 import org.entando.entando.aps.system.services.widgettype.WidgetType;
 import org.entando.entando.aps.system.services.widgettype.WidgetTypeDAO;
 import org.entando.entando.ent.exception.EntException;
+import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * @author M.Diana
  */
-public class TestWidgetTypeDAO extends BaseTestCase {
+class TestWidgetTypeDAO extends BaseTestCase {
 
-    public void testLoadWidgetTypes() throws Throwable {
+    @Test
+    void testLoadWidgetTypes() throws Throwable {
         DataSource dataSource = (DataSource) this.getApplicationContext().getBean("portDataSource");
         WidgetTypeDAO widgetTypeDao = new WidgetTypeDAO();
         widgetTypeDao.setDataSource(dataSource);
@@ -48,7 +52,8 @@ public class TestWidgetTypeDAO extends BaseTestCase {
         assertNull(widgetType);
     }
 
-    public void testGetWidgetType()  {
+    @Test
+    void testGetWidgetType()  {
         String code="login_form";
         DataSource dataSource = (DataSource) this.getApplicationContext().getBean("portDataSource");
         WidgetTypeDAO widgetTypeDao = new WidgetTypeDAO();
@@ -65,5 +70,7 @@ public class TestWidgetTypeDAO extends BaseTestCase {
         assertEquals("login_form",widgetType.getCode());
         assertTrue(widgetType.isReadonlyPageWidgetConfig());
         assertEquals("system",widgetType.getWidgetCategory());
+        assertEquals("font-awesome:fa-sign-in",widgetType.getIcon());
     }
+    
 }
