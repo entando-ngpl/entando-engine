@@ -43,7 +43,7 @@ class GenericResourceUtilsTest {
                     }
                 }
             }
-        } catch (AssertionError ex) {
+        } catch (java.lang.AssertionError ex) {
             System.err.println("\nAt coordinates:\nCO[\n"
                     + "\t" + TD.GROUPS[0][d0] + "(" + d0 + ")\n"
                     + "\t" + TD.GROUPS[1][d1] + "(" + d1 + ")\n]\nRE[\n"

@@ -81,7 +81,7 @@ public class SystemInstallationReport implements Serializable {
             Element rootElement = doc.getRootElement();
             String statusString = rootElement.getAttributeValue(STATUS_ATTRIBUTE);
             if (null != statusString && statusString.trim().length() > 0) {
-                Status status = Enum.valueOf(Status.class, statusString.toUpperCase());
+                SystemInstallationReport.Status status = Enum.valueOf(SystemInstallationReport.Status.class, statusString.toUpperCase());
                 this.setStatus(status);
             }
             Element creationElement = rootElement.getChild(CREATION_ELEMENT);
@@ -114,12 +114,12 @@ public class SystemInstallationReport implements Serializable {
         if (null == status) {
             return false;
         }
-        return (status.equals(Status.OK)
-                || status.equals(Status.PORTING)
-                || status.equals(Status.RESTORE)
-                || status.equals(Status.NOT_AVAILABLE)
-                || status.equals(Status.SKIPPED)
-                || status.equals(Status.UNINSTALLED));
+        return (status.equals(SystemInstallationReport.Status.OK)
+                || status.equals(SystemInstallationReport.Status.PORTING)
+                || status.equals(SystemInstallationReport.Status.RESTORE)
+                || status.equals(SystemInstallationReport.Status.NOT_AVAILABLE)
+                || status.equals(SystemInstallationReport.Status.SKIPPED)
+                || status.equals(SystemInstallationReport.Status.UNINSTALLED));
     }
 
     public static SystemInstallationReport getInstance() {

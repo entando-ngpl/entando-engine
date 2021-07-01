@@ -229,7 +229,7 @@ public class UserDAO extends AbstractDAO implements IUserDAO {
             stat.setString(1, user.getUsername());
             String encodedPassword = passwordEncoder.encode(user.getPassword());
             stat.setString(2, encodedPassword);
-            stat.setDate(3, new java.sql.Date(new Date().getTime()));
+            stat.setDate(3, new java.sql.Date(new java.util.Date().getTime()));
             if (!user.isDisabled()) {
                 stat.setInt(4, 1);
             } else {
@@ -323,7 +323,7 @@ public class UserDAO extends AbstractDAO implements IUserDAO {
             conn = this.getConnection();
             conn.setAutoCommit(false);
             stat = conn.prepareStatement(UPDATE_LAST_ACCESS);
-            stat.setDate(1, new java.sql.Date(new Date().getTime()));
+            stat.setDate(1, new java.sql.Date(new java.util.Date().getTime()));
             stat.setString(2, username);
             stat.executeUpdate();
             conn.commit();

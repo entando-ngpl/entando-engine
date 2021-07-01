@@ -84,17 +84,17 @@ public class LangManagerCacheWrapper extends AbstractGenericCacheWrapper<Lang> i
 
     @Override
     public void addLang(Lang lang) {
-        this.manage(lang.getCode(), lang, Action.ADD);
+        this.manage(lang.getCode(), lang, AbstractGenericCacheWrapper.Action.ADD);
     }
 
     @Override
     public void updateLang(Lang lang) {
-        this.manage(lang.getCode(), lang, Action.UPDATE);
+        this.manage(lang.getCode(), lang, AbstractGenericCacheWrapper.Action.UPDATE);
     }
 
     @Override
     public void removeLang(Lang lang) {
-        this.manage(lang.getCode(), lang, Action.DELETE);
+        this.manage(lang.getCode(), lang, AbstractGenericCacheWrapper.Action.DELETE);
     }
 
     @Override

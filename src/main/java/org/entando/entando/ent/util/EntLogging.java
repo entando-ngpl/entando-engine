@@ -43,9 +43,9 @@ public class EntLogging {
      *  - withXXX
      *  </pre>
      */
-    public static class EntLogger implements Logger {
+    public static class EntLogger implements org.slf4j.Logger {
 
-        protected final Logger delegate;
+        protected final org.slf4j.Logger delegate;
 
         private final SanitizationLevel sanitizationLevel;
         private final EntSanitizer<String> svs;
@@ -106,7 +106,7 @@ public class EntLogging {
             FULL_SANITIZATION,
         }
 
-        private EntLogger(Logger logger, SanitizationLevel sanitizationLevel) {
+        private EntLogger(org.slf4j.Logger logger, SanitizationLevel sanitizationLevel) {
             this.delegate = logger;
             this.sanitizationLevel = sanitizationLevel;
 

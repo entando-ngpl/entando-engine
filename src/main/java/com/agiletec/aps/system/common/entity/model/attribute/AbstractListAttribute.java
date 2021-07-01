@@ -140,7 +140,7 @@ public abstract class AbstractListAttribute extends AbstractComplexAttribute
      * be considered as such.
      *
      * @see
-     * AttributeInterface#getIndexingType()
+     * com.agiletec.aps.system.common.entity.model.attribute.AttributeInterface#getIndexingType()
      */
     @Override
     public String getIndexingType() {
@@ -154,7 +154,7 @@ public abstract class AbstractListAttribute extends AbstractComplexAttribute
      *
      * @return Return always false.
      * @see
-     * AttributeInterface#isSearchable()
+     * com.agiletec.aps.system.common.entity.model.attribute.AttributeInterface#isSearchable()
      */
     @Override
     public boolean isSearchable() {

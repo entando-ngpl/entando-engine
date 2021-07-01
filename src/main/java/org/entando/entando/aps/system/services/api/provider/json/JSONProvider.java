@@ -52,7 +52,7 @@ import org.w3c.dom.Document;
 @Consumes("application/json")
 @Provider
 public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProvider<T>  {
-
+    
     private static final String MAPPED_CONVENTION = "mapped";
     private static final String BADGER_FISH_CONVENTION = "badgerfish";
     private static final String DROP_ROOT_CONTEXT_PROPERTY = "drop.json.root.element";
@@ -63,7 +63,7 @@ public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProv
     static {
         new SimpleConverter();
     }
-
+    
     private ConcurrentHashMap<String, String> namespaceMap = new ConcurrentHashMap<String, String>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
@@ -80,13 +80,13 @@ public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProv
     private boolean attributesToElements;
     private boolean writeNullAsString = true;
     private boolean escapeForwardSlashesAlways;
-
+    
     @Override
     public void setAttributesToElements(boolean value) {
         this.attributesToElements = value;
 		super.setAttributesToElements(value);
     }
-
+    
 	@Override
     public void setConvention(String value) {
         if (!MAPPED_CONVENTION.equals(value) && !BADGER_FISH_CONVENTION.equals(value)) {
@@ -95,7 +95,7 @@ public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProv
         convention = value;
 		super.setConvention(value);
     }
-
+    
 	@Override
     public void setConvertTypesToStrings(boolean convert) {
         if (convert) {
@@ -103,62 +103,62 @@ public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProv
         }
 		super.setConvertTypesToStrings(convert);
     }
-
+    
     @Override
     public void setTypeConverter(TypeConverter converter) {
         this.typeConverter = converter;
 		super.setTypeConverter(converter);
     }
-
+    
     @Override
     public void setIgnoreNamespaces(boolean ignoreNamespaces) {
         this.ignoreNamespaces = ignoreNamespaces;
 		super.setIgnoreNamespaces(ignoreNamespaces);
     }
-
+    
     @Override
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
     }
-
+    
     @Override
     public void setDropRootElement(boolean drop) {
         this.dropRootElement = drop;
 		super.setDropRootElement(drop);
     }
-
+    
     @Override
     public void setIgnoreMixedContent(boolean ignore) {
         this.ignoreMixedContent = ignore;
 		super.setIgnoreMixedContent(ignore);
     }
-
+	
 	@Override
     public void setSerializeAsArray(boolean asArray) {
         this.serializeAsArray = asArray;
 		super.setSerializeAsArray(asArray);
     }
-
+    
 	@Override
     public void setArrayKeys(List<String> keys) {
         this.arrayKeys = keys;
 		super.setArrayKeys(keys);
     }
-
+	
     @Override
     public void setNamespaceMap(Map<String, String> namespaceMap) {
         this.namespaceMap.putAll(namespaceMap);
 		super.setNamespaceMap(namespaceMap);
     }
-
+	
 	@Override
-	protected void marshalCollection(Class<?> originalCls, Object collection,
-                                     Type genericType, String encoding,
+	protected void marshalCollection(Class<?> originalCls, Object collection, 
+                                     Type genericType, String encoding, 
                                      OutputStream os, MediaType m, Annotation[] anns) throws Exception {
         Class<?> actualClass = InjectionUtils.getActualType(genericType);
         actualClass = getActualType(actualClass, genericType, anns);
-        Collection<?> c = originalCls.isArray() ? Arrays.asList((Object[]) collection)
+        Collection<?> c = originalCls.isArray() ? Arrays.asList((Object[]) collection) 
                                              : (Collection<?>) collection;
         Iterator<?> it = c.iterator();
         Object firstObj = it.hasNext() ? it.next() : null;
@@ -196,37 +196,37 @@ public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProv
         }
         os.write(startTag.getBytes());
         if (firstObj != null) {
-            XmlJavaTypeAdapter adapter =
-                JAXBUtils.getAdapter(firstObj.getClass(), anns);
+            XmlJavaTypeAdapter adapter = 
+                org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(firstObj.getClass(), anns);
             marshalCollectionMember(JAXBUtils.useAdapter(firstObj, adapter, true),
                                     actualClass, genericType, encoding, os);
             while (it.hasNext()) {
                 os.write(",".getBytes());
-                marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true),
+                marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true), 
                                         actualClass, genericType, encoding, os);
             }
         }
         os.write(endTag.getBytes());
     }
-
+	
     @Override
-    protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass,
+    protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             return JSONUtils.createBadgerFishWriter(os, enc);
         }
-        boolean dropElementsInXmlStreamProp = getBooleanJsonProperty(DROP_ELEMENT_IN_XML_PROPERTY,
+        boolean dropElementsInXmlStreamProp = getBooleanJsonProperty(DROP_ELEMENT_IN_XML_PROPERTY, 
                                                                      dropElementsInXmlStream);
         boolean dropRootNeeded = getBooleanJsonProperty(DROP_ROOT_CONTEXT_PROPERTY, dropRootElement);
         boolean dropRootInXmlNeeded = dropRootNeeded && dropElementsInXmlStreamProp;
-        QName qname = actualClass == Document.class
-            ? org.apache.cxf.helpers.DOMUtils.getElementQName(((Document)actualObject).getDocumentElement())
+        QName qname = actualClass == Document.class 
+            ? org.apache.cxf.helpers.DOMUtils.getElementQName(((Document)actualObject).getDocumentElement()) 
             : this.getQName(actualClass, genericType, actualObject);
-        if (qname != null && ignoreNamespaces && (isCollection || dropRootInXmlNeeded)) {
+        if (qname != null && ignoreNamespaces && (isCollection || dropRootInXmlNeeded)) {        
             qname = new QName(qname.getLocalPart());
         }
-        Configuration config =
-            JSONUtils.createConfiguration(namespaceMap,
+        Configuration config = 
+            JSONUtils.createConfiguration(namespaceMap, 
                                           writeXsiType && !ignoreNamespaces,
                                           attributesToElements,
                                           typeConverter);
@@ -262,15 +262,15 @@ public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProv
                 theArrayKeys.add(qname.getLocalPart());
             }
         }
-
-        XMLStreamWriter writer = ApsJSONUtils.createStreamWriter(os, qname,
+        
+        XMLStreamWriter writer = ApsJSONUtils.createStreamWriter(os, qname, 
              writeXsiType && !ignoreNamespaces, config, rootIsArray, theArrayKeys,
              isCollection || dropRootInXmlNeeded, enc);
         writer = ApsJSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
         writer = ApsJSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces, !writeXsiType);
         return createTransformWriterIfNeeded(writer, os, dropElementsInXmlStreamProp);
     }
-
+    
     protected List<String> getArrayKeys() {
         MessageContext mc = getContext();
         if (mc != null) {
@@ -281,12 +281,12 @@ public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProv
         }
         return arrayKeys;
     }
-
+    
     protected boolean isRootArray(List<String> theArrayKeys) {
         return theArrayKeys != null ? true : getBooleanJsonProperty(ROOT_IS_ARRAY_PROPERTY, serializeAsArray);
     }
-
-    private QName getQName(Class<?> cls, Type type, Object object)
+    
+    private QName getQName(Class<?> cls, Type type, Object object) 
         throws Exception {
         QName qname = getJaxbQName(cls, type, object, false);
         if (qname != null) {
@@ -295,30 +295,30 @@ public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProv
         }
         return null;
     }
-
+    
     private String getPrefix(String namespace) {
         String prefix = namespaceMap.get(namespace);
         return prefix == null ? "" : prefix;
     }
-
+    
     @Override
     public void setWriteXsiType(boolean writeXsiType) {
         this.writeXsiType = writeXsiType;
 		super.setWriteXsiType(writeXsiType);
     }
-
+    
     @Override
     public void setDropElementsInXmlStream(boolean drop) {
         this.dropElementsInXmlStream = drop;
 		super.setDropElementsInXmlStream(drop);
     }
-
+	
 	@Override
     public void setDropCollectionWrapperElement(boolean drop) {
         this.dropCollectionWrapperElement = drop;
 		super.setDropCollectionWrapperElement(drop);
     }
-
+    
     @Override
     public void setWriteNullAsString(boolean writeNullAsString) {
         this.writeNullAsString = writeNullAsString;
@@ -330,14 +330,14 @@ public class JSONProvider<T> extends org.apache.cxf.jaxrs.provider.json.JSONProv
         this.ignoreEmptyArrayValues = ignoreEmptyArrayElements;
 		super.setIgnoreEmptyArrayValues(ignoreEmptyArrayElements);
     }
-
+	
     @Override
     public void setEscapeForwardSlashesAlways(boolean escape) {
         this.escapeForwardSlashesAlways = escape;
 		super.setEscapeForwardSlashesAlways(escape);
     }
-
-
+	
+	
 	@Override
     public void setNamespaceSeparator(String namespaceSeparator) {
         this.namespaceSeparator = namespaceSeparator;

@@ -24,9 +24,9 @@ import org.jdom.Element;
  * @author E.Santoboni
  */
 public class ComponentInstallationReport implements Serializable {
-
+	
 	private ComponentInstallationReport() {}
-
+	
 	protected ComponentInstallationReport(Element element) {
 		String componentCode = element.getAttributeValue(SystemInstallationReport.CODE_ATTRIBUTE);
 		this.setComponentCode(componentCode);
@@ -45,8 +45,8 @@ public class ComponentInstallationReport implements Serializable {
 		if (null != postProcessElement) {
 			String postProcessStatusString = postProcessElement.getAttributeValue(SystemInstallationReport.STATUS_ATTRIBUTE);
 			if (null != postProcessStatusString) {
-				Status postProcessStatus =
-						Enum.valueOf(Status.class, postProcessStatusString.toUpperCase());
+				SystemInstallationReport.Status postProcessStatus =
+						Enum.valueOf(SystemInstallationReport.Status.class, postProcessStatusString.toUpperCase());
 				this.setPostProcessStatus(postProcessStatus);
 			}
 		}
@@ -81,32 +81,32 @@ public class ComponentInstallationReport implements Serializable {
 		return element;
 	}
 
-	public Status getStatus() {
-		Status schemaStatus = this.getDataSourceReport().getStatus();
-		Status dataStatus = this.getDataReport().getStatus();
+	public SystemInstallationReport.Status getStatus() {
+		SystemInstallationReport.Status schemaStatus = this.getDataSourceReport().getStatus();
+		SystemInstallationReport.Status dataStatus = this.getDataReport().getStatus();
 		boolean isSchemaStatusSafe = SystemInstallationReport.isSafeStatus(schemaStatus);
 		boolean isDataStatusSafe = SystemInstallationReport.isSafeStatus(dataStatus);
-		Status postProcessStatus = this.getPostProcessStatus();
+		SystemInstallationReport.Status postProcessStatus = this.getPostProcessStatus();
 		boolean isPostProcessStatusSafe = SystemInstallationReport.isSafeStatus(postProcessStatus);
 		if (!isSchemaStatusSafe || !isDataStatusSafe ||
-				(!isPostProcessStatusSafe && !postProcessStatus.equals(Status.INIT))) {
-			return Status.INCOMPLETE;
+				(!isPostProcessStatusSafe && !postProcessStatus.equals(SystemInstallationReport.Status.INIT))) {
+			return SystemInstallationReport.Status.INCOMPLETE;
 		} else if (isSchemaStatusSafe && isDataStatusSafe && isPostProcessStatusSafe) {
-			if ((null != schemaStatus && Status.UNINSTALLED.equals(schemaStatus))
-					|| (null != dataStatus && Status.UNINSTALLED.equals(dataStatus))) {
-				return Status.UNINSTALLED;
+			if ((null != schemaStatus && SystemInstallationReport.Status.UNINSTALLED.equals(schemaStatus))
+					|| (null != dataStatus && SystemInstallationReport.Status.UNINSTALLED.equals(dataStatus))) {
+				return SystemInstallationReport.Status.UNINSTALLED;
 			} else {
-				return Status.OK;
+				return SystemInstallationReport.Status.OK;
 			}
 		} else {
-			return Status.INIT;
+			return SystemInstallationReport.Status.INIT;
 		}
 	}
 
 	public boolean isPostProcessExecutionRequired() {
-		Status dataSourceStatus = this.getDataSourceReport().getStatus();
-		Status dataStatus = this.getDataReport().getStatus();
-		Status ok = Status.OK;
+		SystemInstallationReport.Status dataSourceStatus = this.getDataSourceReport().getStatus();
+		SystemInstallationReport.Status dataStatus = this.getDataReport().getStatus();
+		SystemInstallationReport.Status ok = SystemInstallationReport.Status.OK;
 		return (dataSourceStatus.equals(ok) && dataStatus.equals(ok) && !this.getDataReport().isDataAlreadyPresent());
 	}
 
@@ -154,9 +154,9 @@ public class ComponentInstallationReport implements Serializable {
 
 	private String _componentCode;
 	private Date _date;
-	private Status _postProcessStatus = Status.INIT;
-
+	private SystemInstallationReport.Status _postProcessStatus = SystemInstallationReport.Status.INIT;
+	
 	private DataSourceInstallationReport _dataSourceReport;
 	private DataInstallationReport _dataReport;
-
+	
 }

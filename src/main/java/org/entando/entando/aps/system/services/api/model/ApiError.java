@@ -26,44 +26,44 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "error")
 @XmlType(propOrder = {"code", "message"})
 public class ApiError implements Serializable {
-
+	
 	public ApiError() {}
-
+	
 	public ApiError(String code, String message) {
 		this.setCode(code);
 		this.setMessage(message);
 	}
-
-	public ApiError(String code, String message, Status status) {
+	
+	public ApiError(String code, String message, Response.Status status) {
 		this.setCode(code);
 		this.setStatus(status);
 		this.setMessage(message);
 	}
-
+	
 	public String getCode() {
 		return _code;
 	}
 	public void setCode(String code) {
 		this._code = code;
 	}
-
+	
 	public String getMessage() {
 		return _message;
 	}
 	public void setMessage(String message) {
 		this._message = message;
 	}
-
+	
 	public Status getStatus() {
 		return _status;
 	}
 	protected void setStatus(Status status) {
 		this._status = status;
 	}
-
+	
 	private String _code;
 	private String _message;
-
-	private Status _status;
-
+	
+	private Response.Status _status;
+	
 }

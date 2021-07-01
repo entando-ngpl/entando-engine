@@ -68,8 +68,8 @@ public class URLManager extends AbstractURLManager {
      * @param pageUrl L'oggetto contenente le informazioni da tradurre in URL.
      * @param reqCtx Il contesto della richiesta.
      * @return La Stringa contenente l'URL.
-     * @see AbstractURLManager#getURLString(PageURL,
-     * RequestContext)
+     * @see com.agiletec.aps.system.services.url.AbstractURLManager#getURLString(com.agiletec.aps.system.services.url.PageURL,
+     * com.agiletec.aps.system.RequestContext)
      */
     @Override
     public String getURLString(PageURL pageUrl, RequestContext reqCtx) {
