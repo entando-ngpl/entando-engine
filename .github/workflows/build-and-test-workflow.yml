@@ -27,9 +27,6 @@ jobs:
       - name: "PR PIPELINE START"
         run: |
           source <(curl -qsL "https://raw.githubusercontent.com/entando/entando-pipelines/engine-exp/macro/install.sh")
-          ~/ppl-run \
-            pr-status-report --AND \
-            @pr-labels "REMOVE-LABEL-PREPARED" remove "prepared"  # in order to trigger the related label event
       - name: "Checkout"
         run: |
           ~/ppl-run checkout-pr-branch "$REPO_FOLDER"
